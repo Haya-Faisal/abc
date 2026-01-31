@@ -1,0 +1,24 @@
+body{
+    margin: 0;
+}
+
+ #requestOrientationButton {
+    background-color: rgb(241,230,210);
+    border: none;
+    color: rgb(3, 23, 109);
+    padding: 20px 40px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    
+    /* Positioning to center it */
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* Make sure it's on top of everything */
+    z-index: 1000;}
+
