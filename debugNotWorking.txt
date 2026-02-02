@@ -1,0 +1,10 @@
+first go to platform tools folder in command shell
+
+cd .\Downloads\platform-tools\
+
+then activate the adb tools
+
+.\adb.exe devices
+
+
+all with your phone plugged in. 

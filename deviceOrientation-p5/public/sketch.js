@@ -68,6 +68,7 @@ function draw() {
     let posx = random(50, width-50);
     stones.push(new Stone(posx, -5)); // Start above the screen
     lastStoneTime = millis();
+    console.log(stones)
   }
   
   if (gameStarted) {
@@ -190,7 +191,7 @@ function handleOrientation(eventData){
   document.querySelector('#requestOrientationButton').style.display = "none";
 
   gameStarted = true;
-  lastStoneTime = millis();
+  // lastStoneTime = millis();
   // console.log(eventData.alpha, eventData.beta, eventData.gamma);
   
   alpha = eventData.alpha;
