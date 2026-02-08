@@ -1,8 +1,8 @@
 {
-  "name": "Device Orientation P5",
+  "name": "Classified Chat",
   "icons": [
     {
-      "src": "assets/512.png",
+      "src": "assets/521.png",
       "type": "image/png",
       "sizes": "512x512"
     }
