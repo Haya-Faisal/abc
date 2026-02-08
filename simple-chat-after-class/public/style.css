@@ -6,7 +6,7 @@ body{
 .main-wrapper{
     width:100%;
     height:90vh;
-    background-color: bisque;
+    background-color: rgb(190, 160, 229);
     display: flex;
     flex-direction: column;
     /* align-content: stretch; */
@@ -17,7 +17,7 @@ body{
 }
 
 #threadWrapper{
-    background-color: aquamarine;
+    background-color: rgb(68, 19, 138);
     flex-grow: 1;
     margin: 15px 0px; 
     display: flex;
@@ -43,19 +43,21 @@ body{
     /* display: inline-block; */
 }
 .who{
-    background-color: rgb(155, 197, 252);
+    /* background-color: rgb(155, 197, 252); */
     margin-right: 3px;
     font-style: italic;
+    color: floralwhite;
   
 }
 .words{
-    background-color: blanchedalmond;
+    /* background-color: blanchedalmond; */
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: floralwhite;
 }
 
 
 #threadWrapper li:nth-child(even){
-    background-color: rgb(147, 255, 237);
+    background-color: rgb(154, 119, 184);
 }
 /* .words{
     background-color: blanchedalmond;
@@ -70,6 +72,9 @@ body{
     height:20px;
 }
 
+#nameWrapper{
+    align-self: center;
+}
 #nameWrapper input{
     /* width: 100%; */
     height:20px;

@@ -23,30 +23,37 @@ const options = {
     cert: fs.readFileSync("keys-for-local-https/localhost.pem"),
 };
 
-let HTTPSserver=https.createServer(options, app)
+let HTTPSserver = https.createServer(options, app);
+
 
 const { Server } = require('socket.io'); // include library
-const io = new Server(HTTPSserver); // start socket io
+const io = new Server(HTTPSserver); // start socket io 
 
-io.on('connection',(socket)=>{
-    console.log('someone has connected')
+io.on('connection', function(socket){
+    console.log("someone has connected to via socket protocol");
 
-    socket.on("messageFromClient", function(data){
-        console.log(data)
-         let msgForAllClients={
-            sender:"unknown",
-            message:data
-        }
 
-        io.emit("messageFromServer",msgForAllClients);
+    socket.on("messageFromClient", function(incomingMessageData){ // <---------
+        console.log(incomingMessageData); // <---------
+
+        // let msgForAllClients = {
+        //     sender: "unknown",
+        //     message: incomingMessage
+        // }
+
+        io.emit("messageFromServer", incomingMessageData); // <---------
+
+
     })
 
-   
 
-    socket.on("disconnect",()=>{
+    socket.on("disconnect", ()=>{
         console.log("user disconnected")
     })
+
+
 })
+
 // Creating servers and make them listen at their ports:
 HTTPSserver.listen(portHTTPS, function (req, res) {
     console.log("HTTPS Server started at port", portHTTPS);

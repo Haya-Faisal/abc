@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+
+
+    <link rel="manifest" href="manifest.json" />
+
+    <title>Simple Chat</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+
+    <!-- <script src="lib/p5.js"></script> -->
+    <!-- <script src="lib/p5.sound.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+
+  <div class="main-wrapper">
+    <div id="nameWrapper">
+        <input type="text" placeholder="Your Name"><p> </p>
+    </div>
+    <div id="threadWrapper">
+        <ul>
+            <li><span class="who">Bill:</span><span class="words">psst... did you hear about the epstein files</span></li>
+            <li><span class="who">Donald:</span><span class="words">tHe oNeS ReLaTeD To jEfF</span></li>
+            <li><span class="who">Bill:</span><span class="words">THEY ARE OUTT!!!</span></li>
+            <li><span class="who">Donald:</span><span class="words">Y🦆🦆hhh 🦆kkk</span></li>
+            <li><span class="who">Donald:</span><span class="words">🦆l🦆nnn wh🦆t d🦆d y🦆🦆 d🦆 t🦆 my ch🦆ttsss???</span></li>
+             <li><span class="who">Elon:</span><span class="words">Did I?</span></li>
+            <!--<li><span class="who">someone:</span><span class="words">blabla blablablabla blabla blabla blabla blabla blabla blabla blabla blabla</span></li>
+            <li><span class="who">someone:</span><span class="words">blabla</span></li>
+            <li><span class="who">someone:</span><span class="words">blabla</span></li>
+            <li><span class="who">someone:</span><span class="words">blabla blablablabla</span></li> -->
+        </ul>
+    </div>
+    <div>
+        <form id="chatForm">
+            <input id="newMessage" placeholder="Type something" autocomplete="off" />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+
+  </div>
+
+
+
+  <!-- the script tag below should always be at the bottom, right before the closing body tag -->
+  <script src="script.js"></script>
+</body>
+
+</html>
