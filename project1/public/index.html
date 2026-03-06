@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <link rel="manifest" href="../manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js"></script>
+  <title>Snakes</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="lib/p5.js"></script>
+  <!-- <script src="lib/p5.sound.js"></script> -->
+  <!-- include socket.io library: -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+
+  <div class="main-wrapper">
+    <p> Move the screen the snake is at to reach the food. </p>
+    <p id="score-display"> SCORE: </p>
+
+    <div id="p5-canvas-container">
+      <!-- p5 canvas will be appended here. -->
+    </div>
+    <button id="requestOrientationButton" onclick="requestOrientation()">Start</button>
+  </div>
+
+  <!-- sketch.js must come first (sets up canvas + socket), then requestOrientation -->
+  <!-- <script src="script.js"></script> -->
+  <script src="sketch.js"></script>
+  <script src="requestOrientation.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+body{
+    margin: 0;
+    overflow: hidden;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 20;
+    font-style: normal;
+}
+
+.main-wrapper{
+    width:100%;
+    height:100dvh;
+    /* background-color: #fcdddd; */
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    
+}
+
+#requestOrientationButton {
+    background-color: rgb(241,230,210);
+    border: none;
+    color: rgb(2,59,30);
+    padding: 20px 40px;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    position: fixed;
+    bottom: 20px;
+} 
+
+p{
+    color: antiquewhite;
+    text-align: center;
+}
+
+/* #score-display {
+    /* font-family: 'Press Start 2P', monospace; */
+    /* color: antiquewhite;
+    text-align: center;
+    font-size: 14px;
+    margin: 10px 0;
+    padding: 20px 40px;
+} */ 
