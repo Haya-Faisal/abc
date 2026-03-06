@@ -127,6 +127,10 @@ socket.on('tilt', ({ gamma: g, beta: b }) => {
     beta = b
 })
 
+socket.on('score-update', ({ score: s }) => {
+    score = s
+    document.getElementById('score-display').innerText = 'SCORE: ' + score
+})
 // p5js stuff
 function setup() {
   // total no. of cols and rows
@@ -263,7 +267,6 @@ function moveSnake(){
  //once snake head reches the food, dont pop, j unshift. inform the server
   if(foodposx==newhead.x && foodposy==newhead.y){
     Snake.unshift(newhead)
-    socket.emit('food-eaten')
     //making the food disappear after its eaten
     foodposx = undefined
     foodposy = undefined
@@ -271,6 +274,7 @@ function moveSnake(){
     //inc snake speed
     MOVE_INTERVAL-=2
     score++ 
+    socket.emit('food-eaten',{ score })
     document.getElementById('score-display').innerText = 'SCORE: ' + score
     if(score> 10){
       // option1 

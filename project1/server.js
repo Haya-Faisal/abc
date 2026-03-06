@@ -100,7 +100,16 @@ io.on('connection', (socket) => {
 
     //once food gets eaten, send a new food
     //server receive food eaten and sends new food pos with same emit.spawnfood    
-    socket.on('food-eaten',()=>{
+    socket.on('food-eaten',({score })=>{
+        let otherId ;
+        if (role==1){
+        otherId = screen2
+    }else{
+        otherId=screen1
+    }
+        if(otherId)
+            {io.to(otherId).emit('score-update', { score })} 
+
         let newfood=decidefood()
         if (newfood.screen==1){
         io.to(screen1).emit('food-pos',{x:newfood.x,y:newfood.y})
@@ -133,7 +142,11 @@ io.on('connection', (socket) => {
     if(otherId){
         io.to(otherId).emit('tilt', { gamma, beta })
     }
-})
+    })
+
+    socket.on('update-score',(socre)=>{
+
+    })
     
 
     // Disconnect
