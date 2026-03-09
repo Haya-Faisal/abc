@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
     }else{
         otherId=screen1
     }
-        if(score >= 2 && !levelChanged) {
+        if(score >= 5 && !levelChanged) {
         levelChanged = true  // ← never fires again
         io.emit('level-change', { level: 2 })
     }

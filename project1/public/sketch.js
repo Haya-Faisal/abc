@@ -341,7 +341,7 @@ function moveSnake(){
     score++ 
     socket.emit('food-eaten',{ score })
     document.getElementById('score-display').innerText = 'SCORE: ' + score
-    if(score>= 2){
+    if(score>= 5){
       // option1 
       // redirect to level 2
       state="level2"
