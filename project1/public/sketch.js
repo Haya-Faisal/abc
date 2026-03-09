@@ -32,10 +32,21 @@ let foodtimer=0
 let MOVE_INTERVAL=320
 let lastmove=0
 
+let img
+
+function preload(){
+  img=loadImage("./assets/qrcode.png")
+}
+
 // Socket event 
 //startsnake, your role, lobby full, snake enter, snake bouce, snake leave
 socket.on('start-snake',()=>{
   initSnake()
+  document.getElementById('waiting-message').style.display = 'none'
+  document.getElementById('instructions').style.display = 'none'
+  document.getElementById('level1-message').style.display = 'block'
+  document.getElementById('score-display').style.display = 'block'
+  document.getElementById('requestOrientationButton').style.display = 'block'
 })
 
 socket.on('your-role',(role)=>{
@@ -51,6 +62,16 @@ socket.on('all-here',()=>{
 socket.on('lobby-full',()=>{
    state="full"
    console.log("lobby full")
+})
+
+socket.on('level1',()=>{
+  state='level1'
+  hassnake=false
+  document.getElementById('waiting-message').style.display = 'none'
+  document.getElementById('level1-message').style.display = 'block'
+  document.getElementById('score-display').style.display = 'block'
+  document.getElementById('requestOrientationButton').style.display = 'block'
+  document.getElementById('instructions').style.display = 'none'
 })
 
 socket.on('snake-entering',({from,x,y,snakelenght})=>{
@@ -88,7 +109,7 @@ socket.on('snake-entering',({from,x,y,snakelenght})=>{
     }
 
     hassnake = true
-    state    = 'playing'
+    // state    = 'level1'
 
     console.log(Snake)
 
@@ -130,6 +151,39 @@ socket.on('tilt', ({ gamma: g, beta: b }) => {
 socket.on('score-update', ({ score: s }) => {
     score = s
     document.getElementById('score-display').innerText = 'SCORE: ' + score
+    if(score>= 2){
+      // option1 
+      // redirect to level 2
+      state="level2"
+      // options 2
+      // show 'congrats...' text
+      // setTimeout 3 seconds
+      //       redirect to level 2  
+    }
+})
+
+socket.on('level-change', ({ level }) => {
+    if(level === 2){
+        state = 'level2'
+        
+        // show the overlay
+        let overlay = document.getElementById('congrats-overlay')
+        overlay.style.display = 'flex'
+        
+        // hide it after 3 seconds
+        setTimeout(() => {
+            overlay.style.display = 'none'
+            let instructions = document.getElementById('instructions')
+            instructions.style.display = 'block'
+            // update instructions after overlay disappears
+            if(hassnake){
+                instructions.innerText = ' The other phone controls your snake!'
+            } else {
+                instructions.innerText = 'Tilt your phone to control the snake on the other screen!'
+            }
+        }, 3000)
+        document.getElementById('level1-message').style.display = 'none'
+    }
 })
 // p5js stuff
 function setup() {
@@ -146,8 +200,18 @@ function setup() {
 function draw() {
   background(2,59,30);
 
-  if(state=="playing"){
-    gameStarted=true
+  if(state=="level1"){
+    // gameStarted=true
+    updatedirection()
+    if(hassnake){
+      if(millis() - lastmove>MOVE_INTERVAL){
+        moveSnake()
+        lastmove=millis()
+      }
+    }
+  }
+
+  if(state=="level2"){
     updatedirection()
     if(hassnake){
       if(millis() - lastmove>MOVE_INTERVAL){
@@ -171,7 +235,8 @@ function draw() {
   if (state=="waitforotherstojoin"){
     fill(245,250,247);
     textAlign(CENTER);
-    text("Waiting for other screens", width/2, height/2-40);
+    text("waitt", width/2, height/2-40);
+    image(img,0,0,360,500)
   }
 
   if(state=="waiting"){
@@ -218,7 +283,7 @@ function initSnake() {
     snakedirx = 0
     snakediry = 0
     hassnake  = true
-    state='playing'
+    state='level1'
 }
 
 function moveSnake(){
@@ -272,21 +337,18 @@ function moveSnake(){
     foodposy = undefined
     foodtimer=millis()
     //inc snake speed
-    MOVE_INTERVAL-=2
+    MOVE_INTERVAL-=10
     score++ 
     socket.emit('food-eaten',{ score })
     document.getElementById('score-display').innerText = 'SCORE: ' + score
-    if(score> 10){
+    if(score>= 2){
       // option1 
       // redirect to level 2
-
+      state="level2"
       // options 2
       // show 'congrats...' text
       // setTimeout 3 seconds
       //       redirect to level 2  
-
-
-
     }
   }else{//unshift and pop
      Snake.unshift(newhead)
@@ -354,13 +416,23 @@ function handleOrientation(eventData){
   document.querySelector('#requestOrientationButton').style.display = "none";
   // console.log(eventData.alpha, eventData.beta, eventData.gamma);
   
-  // alpha = eventData.alpha;
-  
-
-  if(!hassnake){
-    beta = eventData.beta;
-    gamma = eventData.gamma;
-    socket.emit('tilt', { gamma, beta })
-  }
+  if(state == 'level1'){
+        if(hassnake){
+            // level 1
+            beta = eventData.beta
+            gamma = eventData.gamma
+        }
+    } else if(state == 'level2'){
+        if(!hassnake){
+            // level 2: 
+            beta = eventData.beta
+            gamma = eventData.gamma
+            socket.emit('tilt', { gamma, beta })
+        }
+       
+    }
     
 }
+
+
+//add the jpy stock thing

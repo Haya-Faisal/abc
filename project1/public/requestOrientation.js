@@ -3,6 +3,7 @@ function requestOrientation() {
     // feature detect
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
+        console.log('iOS device — requesting permission')
         .then(permissionState => {
             if (permissionState === 'granted') {
             window.addEventListener('deviceorientation', handleOrientation, true);
@@ -11,6 +12,7 @@ function requestOrientation() {
         .catch(console.error);
     } else {
         // handle regular non iOS 13+ devices
+        console.log('iOS device — requesting permission')
         window.addEventListener('deviceorientation', handleOrientation, true);
     }
 }

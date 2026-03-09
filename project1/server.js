@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
         //get screen one and start snake
         socket.emit('all-here');
         io.to(screen1).emit('start-snake')
+        io.to(screen2).emit('level1')
         console.log('both screens ready');
 
         //then send values to the right screen. food.screen==screen1 io.to(screen1).emit('spawn-food,{x:food.x})
@@ -98,6 +99,7 @@ io.on('connection', (socket) => {
     });
     
 
+    let levelChanged=false
     //once food gets eaten, send a new food
     //server receive food eaten and sends new food pos with same emit.spawnfood    
     socket.on('food-eaten',({score })=>{
@@ -107,9 +109,14 @@ io.on('connection', (socket) => {
     }else{
         otherId=screen1
     }
+        if(score >= 2 && !levelChanged) {
+        levelChanged = true  // ← never fires again
+        io.emit('level-change', { level: 2 })
+    }
         if(otherId)
-            {io.to(otherId).emit('score-update', { score })} 
-
+            {io.to(otherId).emit('score-update', { score })
+        } 
+        
         let newfood=decidefood()
         if (newfood.screen==1){
         io.to(screen1).emit('food-pos',{x:newfood.x,y:newfood.y})

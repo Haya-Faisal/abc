@@ -31,6 +31,7 @@ body{
     border-radius: 10px;
     position: fixed;
     bottom: 20px;
+    display:none;
 } 
 
 p{
@@ -38,11 +39,64 @@ p{
     text-align: center;
 }
 
-/* #score-display {
-    /* font-family: 'Press Start 2P', monospace; */
-    /* color: antiquewhite;
+#waiting-message {
+    font-family: 'Press Start 2P', monospace;
+    color: antiquewhite;
+    text-align: center;
+    padding: 5px 20px;
+    font-size: 20px;
+    /* margin-top: -90px; */
+
+}
+
+ #level1-message,#instructions {
+    font-family: 'Press Start 2P', monospace;
+    color: antiquewhite;
+    text-align: center;
+    padding: 5px 20px;
+    font-size: 15px;
+    margin-top: -90px;
+    display: none;
+}
+
+#level1-message {
+    font-family: 'Press Start 2P', monospace;
+    color: antiquewhite;
+    text-align: center;
+    padding: 5px 20px;
+    font-size: 15px;
+    margin-top: -90px;
+}
+
+
+#score-display {
+     font-family: 'Press Start 2P', monospace; 
+    color: antiquewhite;
     text-align: center;
     font-size: 14px;
-    margin: 10px 0;
-    padding: 20px 40px;
-} */ 
+    /* margin: 5px 0; */
+    padding: 5px 40px;
+    display: none;
+} 
+
+#congrats-overlay {
+    display: none; /* hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* dark blur behind */
+    backdrop-filter: blur(5px); /* blurs everything behind it */
+    z-index: 999; /* sits on top of everything */
+    
+    /* center the text */
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    color: antiquewhite;
+    /* gap: 20px; */
+}

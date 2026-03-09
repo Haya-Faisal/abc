@@ -20,7 +20,22 @@
 <body>
 
   <div class="main-wrapper">
-    <p> Move the screen the snake is at to reach the food. </p>
+    <div id="waiting-message">
+      <p>Welcome to Snakes!! You will need two phones to play this game. Scan the QR code below to start</p>
+    </div>
+
+    <div id="level1-message">
+      <p>Tilt your phone to move the snake! Reach the food to score points. </p>
+    </div>
+
+    <div id="congrats-overlay">
+      <p>CONGRATS!</p>
+      <p>Get ready for level 2...</p>
+      <p>Now the OTHER phone controls the snake!</p>
+    </div>
+
+    <p id="instructions"></p>
+
     <p id="score-display"> SCORE: </p>
 
     <div id="p5-canvas-container">
