@@ -19,6 +19,7 @@ const io = new Server(HTTPSserver);
 
 let screen1 = null;
 let screen2 = null;
+let levelChanged=false
 
 // for food
 // the server decides which screen and which posiiton >> screen=random, x,y in btw screen range return the values
@@ -98,8 +99,6 @@ io.on('connection', (socket) => {
         }
     });
     
-
-    let levelChanged=false
     //once food gets eaten, send a new food
     //server receive food eaten and sends new food pos with same emit.spawnfood    
     socket.on('food-eaten',({score })=>{
@@ -109,8 +108,9 @@ io.on('connection', (socket) => {
     }else{
         otherId=screen1
     }
-        if(score >= 5 && !levelChanged) {
+        if(score >= 2 && !levelChanged) {
         levelChanged = true  // ← never fires again
+        console.log('emitting level-change!')
         io.emit('level-change', { level: 2 })
     }
         if(otherId)
@@ -169,12 +169,3 @@ io.on('connection', (socket) => {
 HTTPSserver.listen(portHTTPS, () => {
     console.log('HTTPS Server started at port', portHTTPS);
 });
-
-//in js, start-snake, lobby full, snake exited
-
-
-
-// snake cannot go reverse
-//when will it be gameover?? if snake hit itself??
-
-// the visuals

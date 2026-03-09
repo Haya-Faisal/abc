@@ -111,7 +111,8 @@ socket.on('snake-entering',({from,x,y,snakelenght})=>{
     hassnake = true
     // state    = 'level1'
 
-    console.log(Snake)
+    updateLevel2Instructions()
+    // console.log(Snake)
 
 })
 
@@ -128,7 +129,7 @@ socket.on('other-disconnected',()=>{
 })
 
 socket.on('food-pos',({x,y})=>{
-  console.log('food received at', x, y)
+  // console.log('food received at', x, y)
   foodposx=x
   foodposy=y
 
@@ -169,6 +170,7 @@ socket.on('level-change', ({ level }) => {
         // show the overlay
         let overlay = document.getElementById('congrats-overlay')
         overlay.style.display = 'flex'
+        console.log("congrats",score)
         
         // hide it after 3 seconds
         setTimeout(() => {
@@ -219,6 +221,14 @@ function draw() {
         lastmove=millis()
       }
     }
+  }
+
+  if(state === 'level1' && hassnake){
+    drawArrows()  // show arrows on this screen
+  }
+
+  if(state === 'level2' && !hassnake){
+    drawArrows()  // this screen is controlling, show arrows 
   }
   
   drawSnake()
@@ -294,27 +304,31 @@ function moveSnake(){
     x: head.x + (snakedirx * cellsize),  
     y: head.y + (snakediry * cellsize)
   }
-  console.log( head)
+  // console.log( head)
 
   if(!exiting){
     if (newhead.x >= 360) {
     exiting=true
     socket.emit('snake-exited', { side: 'right', x: newhead.x, y: head.y,snakelenght:Snake.length })
+    updateLevel2Instructions()
     return
   }
   if (newhead.x < 0) {
     exiting=true
     socket.emit('snake-exited', { side: 'left', x: newhead.x, y: head.y,snakelenght:Snake.length })
+    updateLevel2Instructions()
     return
   }
   if (newhead.y >= 500) {
     exiting=true
     socket.emit('snake-exited', { side: 'bottom', x: head.x, y: newhead.y,snakelenght:Snake.length })
+    updateLevel2Instructions()
     return
   }
   if (newhead.y < 0) {
     exiting=true
     socket.emit('snake-exited', { side: 'top', x: head.x, y: newhead.y,snakelenght:Snake.length })
+    updateLevel2Instructions()
     return
   }
   }
@@ -341,7 +355,7 @@ function moveSnake(){
     score++ 
     socket.emit('food-eaten',{ score })
     document.getElementById('score-display').innerText = 'SCORE: ' + score
-    if(score>= 5){
+    if(score>= 2){
       // option1 
       // redirect to level 2
       state="level2"
@@ -403,6 +417,38 @@ function updatedirection(){
     snakedirx=newdirx
     snakediry=newdiry
 
+}
+
+function updateLevel2Instructions(){
+    if(state !== 'level2') return
+    let instructions = document.getElementById('instructions')
+    if(hassnake){
+        instructions.innerText = 'The other phone controls your snake!'
+    } else {
+        instructions.innerText = 'Tilt your phone to control the snake on the other screen!'
+    }
+}
+
+function drawArrows(){
+    let dull = color(0, 80, 30)    // dull green
+    let bright = color(0, 255, 80) // bright green
+
+    // top arrow — lights up when moving up
+    fill(snakediry === -1 ? bright : dull)
+    noStroke()
+    triangle(180, 10, 160, 40, 200, 40)
+
+    // bottom arrow — lights up when moving down
+    fill(snakediry === 1 ? bright : dull)
+    triangle(180, 490, 160, 460, 200, 460)
+
+    // left arrow — lights up when moving left
+    fill(snakedirx === -1 ? bright : dull)
+    triangle(10, 250, 40, 230, 40, 270)
+
+    // right arrow — lights up when moving right
+    fill(snakedirx === 1 ? bright : dull)
+    triangle(350, 250, 320, 230, 320, 270)
 }
 
 function food(){
