@@ -35,7 +35,7 @@ let lastmove=0
 let img
 
 function preload(){
-  img=loadImage("./assets/qrcode.png")
+  img=loadImage("./assets/qrcodehongkong.png")
 }
 
 // Socket event 
