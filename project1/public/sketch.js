@@ -46,7 +46,7 @@ socket.on('start-snake',()=>{
   document.getElementById('instructions').style.display = 'none'
   document.getElementById('level1-message').style.display = 'block'
   document.getElementById('score-display').style.display = 'block'
-  document.getElementById('requestOrientationButton').style.display = 'block'
+  // document.getElementById('requestOrientationButton').style.display = 'block'
 })
 
 socket.on('your-role',(role)=>{
@@ -70,7 +70,7 @@ socket.on('level1',()=>{
   document.getElementById('waiting-message').style.display = 'none'
   document.getElementById('level1-message').style.display = 'block'
   document.getElementById('score-display').style.display = 'block'
-  document.getElementById('requestOrientationButton').style.display = 'block'
+  // document.getElementById('requestOrientationButton').style.display = 'block'
   document.getElementById('instructions').style.display = 'none'
 })
 
@@ -461,15 +461,16 @@ function food(){
 
 function handleOrientation(eventData){
   document.querySelector('#requestOrientationButton').style.display = "none";
+
   // console.log(eventData.alpha, eventData.beta, eventData.gamma);
   
   if(state == 'level1'){
-        if(state == 'level1'){
+        // if(state == 'level1'){
     if(hassnake){
         beta = eventData.beta
         gamma = eventData.gamma
     } 
-}
+// }
     } else if(state == 'level2'){
         if(!hassnake){
             // level 2: 

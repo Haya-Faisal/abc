@@ -6,7 +6,7 @@ function requestOrientation() {
         .then(permissionState => {
             if (permissionState === 'granted') {
             window.addEventListener('deviceorientation', handleOrientation, true);
-            document.querySelector('#requestOrientationButton').style.display = "none";
+            // document.querySelector('#requestOrientationButton').style.display = "none";
             }
         })
         .catch(console.error);
@@ -14,7 +14,7 @@ function requestOrientation() {
         // handle regular non iOS 13+ devices
         console.log('iOS device — requesting permission')
         window.addEventListener('deviceorientation', handleOrientation, true);
-        document.querySelector('#requestOrientationButton').style.display = "none";
+        // document.querySelector('#requestOrientationButton').style.display = "none";
     }
 }
 // node server.js
