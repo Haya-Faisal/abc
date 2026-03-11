@@ -152,7 +152,7 @@ socket.on('tilt', ({ gamma: g, beta: b }) => {
 socket.on('score-update', ({ score: s }) => {
     score = s
     document.getElementById('score-display').innerText = 'SCORE: ' + score
-    if(score>= 2){
+    if(score>= 5){
       // option1 
       // redirect to level 2
       state="level2"
@@ -468,11 +468,7 @@ function handleOrientation(eventData){
     if(hassnake){
         beta = eventData.beta
         gamma = eventData.gamma
-    } else {
-        beta = eventData.beta
-        gamma = eventData.gamma
-        socket.emit('tilt', { gamma, beta })
-    }
+    } 
 }
     } else if(state == 'level2'){
         if(!hassnake){
