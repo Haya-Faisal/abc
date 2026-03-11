@@ -11,8 +11,6 @@
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js"></script>
   <title>Snakes</title>
   <link rel="stylesheet" type="text/css" href="style.css">
-  <script src="lib/p5.js"></script>
-  <!-- <script src="lib/p5.sound.js"></script> -->
   <!-- include socket.io library: -->
   <script src="socket.io/socket.io.js"></script>
 </head>
@@ -21,7 +19,11 @@
 
   <div class="main-wrapper">
     <div id="waiting-message">
-      <p>Welcome to Snakes!! You will need two phones to play this game. Scan the QR code below to start</p>
+      <p>Welcome to Snakes!! Press the button below to start.</p>
+    </div>
+
+    <div id="one-phone">
+      <p>You will need two phones to play the game. Scan the QR code below</p>
     </div>
 
     <div id="level1-message">

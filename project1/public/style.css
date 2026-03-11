@@ -31,7 +31,7 @@ body{
     border-radius: 10px;
     position: fixed;
     bottom: 20px;
-    display:none;
+    /* display:none; */
 } 
 
 p{
@@ -45,6 +45,18 @@ p{
     text-align: center;
     padding: 5px 20px;
     font-size: 20px;
+    
+    /* margin-top: -90px; */
+
+}
+
+#one-phone {
+    font-family: 'Press Start 2P', monospace;
+    color: antiquewhite;
+    text-align: center;
+    padding: 5px 20px;
+    font-size: 20px;
+    display: none;
     /* margin-top: -90px; */
 
 }
