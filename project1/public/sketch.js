@@ -464,11 +464,16 @@ function handleOrientation(eventData){
   // console.log(eventData.alpha, eventData.beta, eventData.gamma);
   
   if(state == 'level1'){
-        if(hassnake){
-            // level 1
-            beta = eventData.beta
-            gamma = eventData.gamma
-        }
+        if(state == 'level1'){
+    if(hassnake){
+        beta = eventData.beta
+        gamma = eventData.gamma
+    } else {
+        beta = eventData.beta
+        gamma = eventData.gamma
+        socket.emit('tilt', { gamma, beta })
+    }
+}
     } else if(state == 'level2'){
         if(!hassnake){
             // level 2: 
