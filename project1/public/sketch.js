@@ -178,10 +178,11 @@ socket.on('level-change', ({ level }) => {
             let instructions = document.getElementById('instructions')
             instructions.style.display = 'block'
             // update instructions after overlay disappears
+            //initial idea was for the text to alternate. but not working right
             if(hassnake){
-                instructions.innerText = ' The other phone controls your snake!'
+                instructions.innerText = ' The snake is controlled by the screen it is not displayed on!'
             } else {
-                instructions.innerText = 'Tilt your phone to control the snake on the other screen!'
+                instructions.innerText = 'The snake is controlled by the screen it is not displayed on!'
             }
         }, 3000)
         document.getElementById('level1-message').style.display = 'none'
