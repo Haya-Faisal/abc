@@ -460,9 +460,10 @@ function food(){
 }
 
 function handleOrientation(eventData){
+  // console.log("")
   document.querySelector('#requestOrientationButton').style.display = "none";
 
-  // console.log(eventData.alpha, eventData.beta, eventData.gamma);
+  console.log(eventData.alpha, eventData.beta, eventData.gamma);
   
   if(state == 'level1'){
         // if(state == 'level1'){
