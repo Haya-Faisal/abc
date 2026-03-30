@@ -22,7 +22,14 @@
 <body>
   <div id="p5-canvas-container"></div>
   <script src="lib/p5.js"></script> 
-  <script src="/socket.io/socket.io.js"></script>
+   <script>
+    // load the correct socket.io client depending on the server
+    var isHK = location.hostname.toLowerCase().startsWith('browsercircus');
+    var s = document.createElement('script');
+    s.src = isHK ? '/lesley/port-4290/socket.io/socket.io.js' : '/socket.io/socket.io.js';
+    document.write('<script src="' + s.src + '"><\/script>');
+  </script>
+  
   <script src="sky.js"></script>
 </body>
 </html>
