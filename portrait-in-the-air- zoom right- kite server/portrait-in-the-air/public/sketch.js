@@ -6,7 +6,6 @@ let currentLatitude = 0; // global variables will be updated as we get GPS data
 let mapInit = false; // we only do map stuff once mapInit is true (see in draw)
 let me; // point object showing our own location
 let zoomLocked = false;
-let GPS_GRANTED = false;
 
 // Cloth system globals
 let cloths = [];
@@ -50,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 29; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 15; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
@@ -125,8 +124,6 @@ function setup() {
     window.visualViewport.addEventListener("scroll", updateUILayout);
     updateUILayout();
   }
-
-  imgs = shuffle(imgs);
 }
 
 function draw() {
@@ -251,14 +248,14 @@ class MyPoint {
     rotate(this.emojiAdjustAngle);
     translate(0, -12);
     textAlign(CENTER, CENTER);
-    textSize(36);
+    textSize(26);
     text("🪡", 0, 0);
     pop();
     fill(255, 0, 0);
     noStroke();
     textAlign(LEFT);
     textSize(10);
-    // text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
+    text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
     pop();
   }
 }
@@ -347,9 +344,9 @@ function spawnCloths(lat, lng) {
   cloths = [];
   clusterGroups = [];
   let MIN_CENTER_M = 18;
-  let MIN_RING_M = 20;
-  let MAX_CLOTHS = 10; // updated to match total number of images
-  let MAX_RING_M = 100;
+  let MIN_RING_M = 10;
+  let MAX_CLOTHS = 15; // updated to match total number of images
+  let MAX_RING_M = 50;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));
 
@@ -616,7 +613,7 @@ function shareAllGroups() {
     gfx.remove();
 
     // POST to server so it saves + broadcasts to sky screen
-    fetch("kites", {
+    fetch("/kites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageData }),
@@ -624,7 +621,6 @@ function shareAllGroups() {
       .then((r) => r.json())
       .then((data) => {
         if (data.ok) console.log("Kite sent to sky screen!", data.kite.id);
-        window.open("sky.html", "_self");
       })
       .catch((err) => console.error("Failed to send kite:", err));
 
@@ -632,6 +628,8 @@ function shareAllGroups() {
   }
 
   if (sent == 0) alert("Stitch some pieces together first!");
+
+  window.open("sky.html", "_self");
 }
 
 function getGroupOf(c) {

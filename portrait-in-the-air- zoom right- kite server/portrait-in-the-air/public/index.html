@@ -8,7 +8,7 @@
   
   <link rel="manifest" href="manifest.json" />
 
-  <title>Portrait in the air</title>
+  <title>CCLab Project</title>
 
   <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -18,18 +18,21 @@
   <script src="socket.io/socket.io.js"></script>  
   <script src="lib/p5.sound.js"></script>
   
+
 </head>
 
 <body>
-  <button id="requestOrientationButton" onclick="requestGPS()" >Start sewing 🪡</button>
+  <button id="requestOrientationButton" onclick="requestGPS()" style="position:fixed;top:20px;left:20px;">request GPS</button>
 
   <div class="main-wrapper">
-    
+    <!-- <h1>Project Title</h1> -->
+
     <!-- the following div will contain the p5 canvas. -->
     <div id="p5-canvas-container">
       <!-- p5 canvas will be appended here. -->
     </div>
 
+    <!-- <p>Project Description</p> -->
   </div>
 
 
