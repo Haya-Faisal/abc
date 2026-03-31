@@ -49,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 25; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 20; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
