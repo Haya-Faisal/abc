@@ -629,7 +629,7 @@ function shareAllGroups() {
 
   if (sent == 0) alert("Stitch some pieces together first!");
 
-  window.open("sky.html", "_blank");
+  window.open("sky.html", "_self");
 }
 
 function getGroupOf(c) {
