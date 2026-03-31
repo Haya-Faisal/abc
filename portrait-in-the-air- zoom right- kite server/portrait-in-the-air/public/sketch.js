@@ -114,7 +114,7 @@ function setup() {
     pointer-events: auto;
     white-space: nowrap;
     z-index: 10000;
-    transform-origin: center;updateMapContent
+    transform-origin: center;
   `;
   btn.addEventListener("click", shareAllGroups);
   uiLayer.appendChild(btn);
@@ -225,8 +225,8 @@ class MyPoint {
     this.emojiAdjustAngle = radians(45);
   }
   update() {
-    this.x = this.goalX; // lerp(this.x, this.goalX, 0.2);
-    this.y = this.goalY; //lerp(this.y, this.goalY, 0.2);
+    this.x = lerp(this.x, this.goalX, 0.2);
+    this.y = lerp(this.y, this.goalY, 0.2);
   }
   updateHeading(h) {
     this.heading = h;
@@ -730,5 +730,5 @@ function updateUILayout() {
 }
 
 function windowResized() {
-  // resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
 }
