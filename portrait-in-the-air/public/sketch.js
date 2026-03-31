@@ -49,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 15; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 8; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
@@ -124,6 +124,7 @@ function setup() {
     window.visualViewport.addEventListener("scroll", updateUILayout);
     updateUILayout();
   }
+  imgs = shuffle(imgs);
 }
 
 function draw() {
