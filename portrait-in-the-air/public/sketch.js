@@ -613,7 +613,7 @@ function shareAllGroups() {
     gfx.remove();
 
     // POST to server so it saves + broadcasts to sky screen
-    fetch("/kites", {
+    fetch("kites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageData }),
