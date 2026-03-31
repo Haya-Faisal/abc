@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
  
   
   <link rel="manifest" href="manifest.json" />
@@ -18,21 +18,18 @@
   <script src="socket.io/socket.io.js"></script>  
   <script src="lib/p5.sound.js"></script>
   
-
 </head>
 
 <body>
-  <button id="requestOrientationButton" onclick="requestGPS()" style="position:fixed;top:20px;left:20px;">request GPS</button>
+  <button id="requestOrientationButton" onclick="requestGPS()" >Start sewing 🪡</button>
 
   <div class="main-wrapper">
-    <!-- <h1>Project Title</h1> -->
-
+    
     <!-- the following div will contain the p5 canvas. -->
     <div id="p5-canvas-container">
       <!-- p5 canvas will be appended here. -->
     </div>
 
-    <!-- <p>Project Description</p> -->
   </div>
 
 

@@ -1,8 +1,28 @@
+const segCount = 9; // number of string segments
+const segLength = 50; // rest length of each segment (px)
+const stiffness = 0.08; // spring stiffness
+const gravity = 0.15;
+const upForce = -1; // lift applied to kite node
+const windAmp = 0.4; // how much the wind pushes sideways
+const windFreq = 0.007; // speed of wind
+const nodeM = 25; // 中间节点统一质量
+const kiteM = 10; // 风筝质点质量
+const ROT_DAMPING = 0.92;
+const ROT_STIFF = 0.0000001;
+const WIND_TORQUE = 0.08;
+
+let KITE_SPACING; // horizontal pixels between kite anchors
+const LEFT_MARGIN = 200; // gap before the first kite
+const RIGHT_MARGIN = 200; // gap after the last kite
+
 let kites = [];
 let socket;
-let grass = [];
-let stars = [];
-const WIDTH = 2000;
+
+// canvas width grows as kites are added
+// starts wide enough for at least one kite
+let windowWidth = 500;
+let canvasWidth = windowWidth;
+
 if (
   location.hostname.toLowerCase().startsWith("browsercircus") ||
   location.hostname.toLowerCase().startsWith("www")
@@ -12,62 +32,70 @@ if (
   socket = io();
 }
 
-function setup() {
-  createCanvas(WIDTH, windowHeight);
+// calculate the anchor X for a kite at a given index
+function anchorXForIndex(i) {
+  KITE_SPACING = random(40, 100);
+  return LEFT_MARGIN + i * KITE_SPACING;
+}
 
-  for (let i = 0; i < width / 5; i++) {
-    grass.push({
-      x: random(width),
-      h: random(20, 55),
-      phase: random(TWO_PI),
-      col: color(random(60, 110), random(120, 170), random(30, 70)),
-    });
+// calculate the total canvas width needed for n kites
+function widthForKiteCount(n) {
+  if (n === 0) return windowWidth;
+  return max(windowWidth, LEFT_MARGIN + (n - 1) * KITE_SPACING + RIGHT_MARGIN);
+}
+
+// grow the canvas if needed and update the body/scroll container
+function growCanvasIfNeeded() {
+  let needed = widthForKiteCount(kites.length);
+  if (needed > canvasWidth) {
+    canvasWidth = needed;
+    resizeCanvas(canvasWidth, windowHeight);
   }
+}
 
-  // new kite arriving live
+function setup() {
+  // canvasWidth = widthForKiteCount(0);
+  createCanvas(canvasWidth, windowHeight);
+
   socket.on("new-kite", function (kiteData) {
-    let k = new Kite(kiteData);
-    k.x = width + 150; // fly in from the right
+    let index = kites.length; // next slot in order
+    let k = new Kite(kiteData, index);
     kites.push(k);
+    growCanvasIfNeeded();
   });
 
   // load all kites saved on the server
-  fetch("kites")
+  fetch("/kites")
     .then(function (r) {
       return r.json();
     })
     .then(function (data) {
-      for (let k of data) {
-        kites.push(new Kite(k));
+      for (let i = 0; i < data.length; i++) {
+        kites.push(new Kite(data[i], i));
       }
       console.log("Loaded", data.length, "kites");
+      growCanvasIfNeeded();
     })
     .catch(function (e) {
       console.error("Could not load kites:", e);
     });
 }
 
-// ─── DRAW ────────────────────────────────────────────────────
 function draw() {
-  background(245, 238, 225);
-  //do need for this line. it makes the code crash since there is no mymap on sky screen.
-  // myMap.map.dragging.disable();
+  background(245, 238, 220);
 
-  // faint specks in sky
+  // ground strip
   noStroke();
-  for (let s of stars) {
-    fill(180, 170, 155, 120);
-    circle(s.x, s.y, s.r * 2);
-  }
+  fill(90, 145, 55);
+  rect(0, height - 30, canvasWidth, 30);
 
-  // kites
-
+  // update + draw all kites
   for (let k of kites) {
-    k.move();
+    k.update();
     k.display();
   }
 
-  // empty state
+  // empty state message
   if (kites.length === 0) {
     fill(160, 145, 125, 180);
     noStroke();
@@ -75,18 +103,15 @@ function draw() {
     textSize(18);
     text(
       "No kites yet — stitch some pieces and share your quilt!",
-      width / 2,
+      windowWidth / 2,
       height * 0.4,
     );
   }
 }
 
-//  KITE CLASS
 class Kite {
-  constructor(kiteData) {
-    this.imageData = kiteData.imageData; // base64 PNG string
-
-    // load into a p5 Image
+  constructor(kiteData, index) {
+    // ── image loading ──
     this.img = null;
     let self = this;
     loadImage(
@@ -99,99 +124,153 @@ class Kite {
       },
     );
 
-    // position — random spot in the sky
-    this.x = random(width * 0.1, width * 0.9);
-    this.y = random(height * 0.05, height * 0.16);
-    this.anchorbase = this.y;
-
-    // very gentle drift
-    this.speedX = random(-0.5, 0.5);
-    this.speedY = random(-0.08, 0.08);
-
-    // wobble
-    this.wobble = random(TWO_PI);
-    this.wobbleSpeed = random(0.008, 0.018);
-
-    // how wide to display the kite (height scales with image ratio)
+    // ── display size ──
     this.displayW = random(120, 200);
 
-    // string length below the kite
-    this.stringLen = random(270, 500);
+    // ── anchor position — placed in order, evenly spaced ──
+    this.anchorX = anchorXForIndex(index);
+    this.anchorY = height - 30;
+
+    // ── build the string: chain of Ball nodes ──
+    this.nodes = [];
+    for (let j = 0; j <= segCount; j++) {
+      let n = new Ball(this.anchorX, this.anchorY - j * segLength, 5);
+      if (j === 0) {
+        n.mass = 0; // anchor — fixed
+      } else if (j === segCount) {
+        n.mass = kiteM; // kite node
+      } else {
+        n.mass = nodeM; // middle string nodes
+      }
+      this.nodes.push(n);
+    }
+
+    // ── build springs between consecutive nodes ──
+    this.springs = [];
+    for (let j = 0; j < this.nodes.length - 1; j++) {
+      this.springs.push(
+        new Spring(this.nodes[j], this.nodes[j + 1], segLength, stiffness),
+      );
+    }
+
+    // ── per-kite variation ──
+    this.phase = random(TWO_PI);
+    this.angle = 0;
+    this.angleR = 0;
+    this.angularVel = 0;
   }
 
-  move() {
-    this.x += this.speedX;
-    this.y += sin(frameCount * 0.009 + this.wobble) * 0.35;
+  update() {
+    let kiteNode = this.nodes[this.nodes.length - 1];
 
-    // wrap left/right
-    if (this.x > width + 200) this.x = -200;
-    if (this.x < -200) this.x = width + 200;
+    kiteNode.applyForce(createVector(0, upForce));
 
-    // bounce inside sky zone
-    let minY = height * 0.33;
-    let maxY = height * 0.53;
-    if (this.y < minY) this.speedY = abs(this.speedY);
-    if (this.y > maxY) this.speedY = -abs(this.speedY);
-    this.y = constrain(this.y, minY, maxY);
+    let wx =
+      sin(frameCount * windFreq + this.phase) * windAmp + random(-0.02, 0.02);
+    kiteNode.applyForce(createVector(wx, 0));
+
+    for (let s of this.springs) s.update();
+
+    for (let j = 1; j < this.nodes.length; j++) {
+      this.nodes[j].update();
+      if (this.nodes[j].pos.y > height - 32) {
+        this.nodes[j].pos.y = height - 32;
+        this.nodes[j].vel.y *= -0.2;
+      }
+    }
+
+    let torque = wx * WIND_TORQUE * 10 - this.angle * ROT_STIFF;
+    this.angularVel = (this.angularVel + torque) * ROT_DAMPING;
+    this.angle = constrain(this.angle + this.angularVel, -0.5, 0.5);
+    this.angleR = lerp(this.angleR, this.angle, 0.005);
   }
 
   display() {
-    if (!this.img) return; // still loading
+    let kiteNode = this.nodes[this.nodes.length - 1];
 
-    push();
-    translate(this.x, this.y);
-
-    // gentle tilt
-    let tilt = sin(frameCount * this.wobbleSpeed + this.wobble) * 0.1;
-    rotate(tilt);
-
-    // figure out display height from image ratio
-    let ratio = this.img.height / this.img.width;
-    let dispW = this.displayW;
-    let dispH = dispW * ratio;
-
-    // ── kite image (the stitched quilt) ──
-    imageMode(CENTER);
-    image(this.img, 0, 0, dispW, dispH);
-
-    // ── string hanging below ──
-    // anchor at the bottom-centre of the kite
-    let anchorY = 0;
-    stroke(140, 110, 70, 180);
+    // string as smooth curve
+    stroke(140, 100, 60, 210);
     strokeWeight(1.5);
     noFill();
+    beginShape();
+    curveVertex(this.nodes[0].pos.x, this.nodes[0].pos.y);
+    for (let n of this.nodes) curveVertex(n.pos.x, n.pos.y);
+    curveVertex(kiteNode.pos.x, kiteNode.pos.y);
+    endShape();
 
-    // draw a wavy string as a series of short lines
-    let segments = 24;
-    let segLen = this.stringLen / segments;
-    let prevX = 0,
-      prevY = anchorY;
-    for (let i = 1; i <= segments; i++) {
-      let nx = sin(frameCount * 0.035 + i * 0.55 + this.wobble) * 5;
-      let ny = anchorY + segLen * i;
-      line(prevX, prevY, nx, ny);
-      prevX = nx;
-      prevY = ny;
-    }
-
-    // small dot at the string end
+    // anchor dot
     noStroke();
-    fill(180, 140, 80, 200);
-    ellipse(prevX, prevY, 9, 6);
+    fill(70, 50, 30);
+    circle(this.nodes[0].pos.x, this.nodes[0].pos.y, 9);
+
+    // kite image
+    push();
+    translate(kiteNode.pos.x, kiteNode.pos.y);
+    rotate(this.angleR);
+
+    if (this.img && this.img.width > 0) {
+      let ratio = this.img.height / this.img.width;
+      let dispW = this.displayW;
+      let dispH = dispW * ratio;
+      imageMode(CENTER);
+      image(this.img, 0, 0, dispW, dispH);
+    } else {
+      // fallback while image loads
+      fill(200, 180, 160);
+      stroke(255, 255, 255, 130);
+      strokeWeight(1.5);
+      rectMode(CENTER);
+      rect(0, 0, 38, 38, 5);
+    }
 
     pop();
   }
 }
 
-// ─── RESIZE ──────────────────────────────────────────────────
-function windowResized() {
-  resizeCanvas(WIDTH, windowHeight);
-  for (let i = 0; i < width / 5; i++) {
-    grass.push({
-      x: random(width),
-      h: random(20, 55),
-      phase: random(TWO_PI),
-      col: color(random(60, 110), random(120, 170), random(30, 70)),
-    });
+class Ball {
+  constructor(x, y, rad) {
+    this.pos = createVector(x, y);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.rad = rad;
+    this.mass = rad * 0.5;
+    this.damping = 0.97;
   }
+
+  update() {
+    this.vel.add(this.acc);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+    this.vel.mult(this.damping);
+  }
+
+  applyForce(f) {
+    if (this.mass <= 0) return;
+    this.acc.add(p5.Vector.div(f, this.mass));
+  }
+}
+
+class Spring {
+  constructor(a, b, restLength, k) {
+    this.bobA = a;
+    this.bobB = b;
+    this.len = restLength;
+    this.k = k;
+  }
+
+  update() {
+    let vec = p5.Vector.sub(this.bobB.pos, this.bobA.pos);
+    let stretch = vec.mag() - this.len;
+    let force = vec
+      .copy()
+      .normalize()
+      .mult(-1 * stretch * this.k);
+    this.bobB.applyForce(force);
+    this.bobA.applyForce(force.copy().mult(-1));
+  }
+}
+
+function windowResized() {
+  canvasWidth = widthForKiteCount(kites.length);
+  resizeCanvas(canvasWidth, windowHeight);
 }
