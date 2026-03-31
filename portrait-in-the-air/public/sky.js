@@ -32,7 +32,7 @@ function setup() {
   });
 
   // load all kites saved on the server
-  fetch("/kites")
+  fetch("kites")
     .then(function (r) {
       return r.json();
     })
