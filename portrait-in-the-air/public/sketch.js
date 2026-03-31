@@ -240,11 +240,11 @@ class MyPoint {
     stroke(255, 0, 0, 80);
     strokeWeight(1);
     let diameter = 2 * metersToPixel(this.accuracy, currentLatitude);
-    // circle(0, 0, diameter);
+    circle(0, 0, diameter);
     fill(this.col);
     stroke("pink");
     strokeWeight(3);
-    // circle(0, 0, this.size + sin(frameCount * 0.1) * 2);
+    circle(0, 0, this.size + sin(frameCount * 0.1) * 2);
     push();
     rotate(radians(this.heading));
     rotate(this.emojiAdjustAngle);
