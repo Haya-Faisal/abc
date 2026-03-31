@@ -248,7 +248,7 @@ class MyPoint {
     rotate(this.emojiAdjustAngle);
     translate(0, -12);
     textAlign(CENTER, CENTER);
-    textSize(26);
+    textSize(36);
     text("🪡", 0, 0);
     pop();
     fill(255, 0, 0);
@@ -344,9 +344,9 @@ function spawnCloths(lat, lng) {
   cloths = [];
   clusterGroups = [];
   let MIN_CENTER_M = 18;
-  let MIN_RING_M = 10;
+  let MIN_RING_M = 20;
   let MAX_CLOTHS = 15; // updated to match total number of images
-  let MAX_RING_M = 50;
+  let MAX_RING_M = 100;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));
 
