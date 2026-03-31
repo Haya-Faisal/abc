@@ -49,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 29; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 15; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
@@ -114,7 +114,7 @@ function setup() {
     pointer-events: auto;
     white-space: nowrap;
     z-index: 10000;
-    transform-origin: center;updateMapContent
+    transform-origin: center;
   `;
   btn.addEventListener("click", shareAllGroups);
   uiLayer.appendChild(btn);
@@ -124,8 +124,6 @@ function setup() {
     window.visualViewport.addEventListener("scroll", updateUILayout);
     updateUILayout();
   }
-
-  // imgs = shuffle(imgs);
 }
 
 function draw() {
@@ -227,7 +225,7 @@ class MyPoint {
     this.emojiAdjustAngle = radians(45);
   }
   update() {
-    this.x = this.goalX; // lerp(this.x, this.goalX, 0.2);
+    this.x = this.goalX; //lerp(this.x, this.goalX, 0.2);
     this.y = this.goalY; //lerp(this.y, this.goalY, 0.2);
   }
   updateHeading(h) {
@@ -250,14 +248,14 @@ class MyPoint {
     rotate(this.emojiAdjustAngle);
     translate(0, -12);
     textAlign(CENTER, CENTER);
-    textSize(36);
+    textSize(26);
     text("🪡", 0, 0);
     pop();
     fill(255, 0, 0);
     noStroke();
     textAlign(LEFT);
     textSize(10);
-    // text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
+    text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
     pop();
   }
 }
@@ -346,9 +344,9 @@ function spawnCloths(lat, lng) {
   cloths = [];
   clusterGroups = [];
   let MIN_CENTER_M = 18;
-  let MIN_RING_M = 20;
-  let MAX_CLOTHS = 10; // updated to match total number of images
-  let MAX_RING_M = 100;
+  let MIN_RING_M = 10;
+  let MAX_CLOTHS = 15; // updated to match total number of images
+  let MAX_RING_M = 50;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));
 
@@ -731,5 +729,5 @@ function updateUILayout() {
 }
 
 function windowResized() {
-  // resizeCanvas(windowWidth, windowHeight);
+  //resizeCanvas(windowWidth, windowHeight);
 }
