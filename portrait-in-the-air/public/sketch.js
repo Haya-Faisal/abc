@@ -6,7 +6,6 @@ let currentLatitude = 0; // global variables will be updated as we get GPS data
 let mapInit = false; // we only do map stuff once mapInit is true (see in draw)
 let me; // point object showing our own location
 let zoomLocked = false;
-let GPS_GRANTED = false;
 
 // Cloth system globals
 let cloths = [];
@@ -126,7 +125,7 @@ function setup() {
     updateUILayout();
   }
 
-  imgs = shuffle(imgs);
+  // imgs = shuffle(imgs);
 }
 
 function draw() {
@@ -616,7 +615,7 @@ function shareAllGroups() {
     gfx.remove();
 
     // POST to server so it saves + broadcasts to sky screen
-    fetch("kites", {
+    fetch("/kites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageData }),
