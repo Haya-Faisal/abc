@@ -23,7 +23,7 @@ if (
   location.hostname.toLowerCase().startsWith("browsercircus") ||
   location.hostname.toLowerCase().startsWith("www")
 ) {
-  socket = io({ path: "/haya/port-4230/socket.io" });
+  socket = io({ path: "/lesley/port-4290/socket.io" });
 } else {
   socket = io();
 }
@@ -49,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 15; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 29; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
@@ -124,6 +124,7 @@ function setup() {
     window.visualViewport.addEventListener("scroll", updateUILayout);
     updateUILayout();
   }
+
   imgs = shuffle(imgs);
 }
 
@@ -223,10 +224,12 @@ class MyPoint {
     this.col = color(170, 240, 190);
     this.accuracy = 0;
     this.heading = 0;
-    this.emojiAdjustAngle = radians(45);
+    this.emojiAdjustAngle = 0;
+    this.startFrame = frameCount;
+    this.bounceDuration = 60 * 5;
   }
   update() {
-    this.x = this.goalX; //lerp(this.x, this.goalX, 0.2);
+    this.x = this.goalX; // lerp(this.x, this.goalX, 0.2);
     this.y = this.goalY; //lerp(this.y, this.goalY, 0.2);
   }
   updateHeading(h) {
@@ -239,24 +242,40 @@ class MyPoint {
     stroke(255, 0, 0, 80);
     strokeWeight(1);
     let diameter = 2 * metersToPixel(this.accuracy, currentLatitude);
-    // circle(0, 0, diameter);
+    //circle(0, 0, diameter);
     fill(this.col);
     stroke("pink");
     strokeWeight(3);
-    // circle(0, 0, this.size + sin(frameCount * 0.1) * 2);
+    //circle(0, 0, this.size + sin(frameCount * 0.1) * 2);
+    let bounceY = 0;
+
+    if (frameCount - this.startFrame < this.bounceDuration) {
+      bounceY = sin(frameCount * 0.15) * 8;
+    } else {
+      bounceY = 0;
+    }
     push();
     rotate(radians(this.heading));
     rotate(this.emojiAdjustAngle);
-    translate(0, -12);
+    translate(0, -12 + bounceY);
     textAlign(CENTER, CENTER);
-    textSize(36);
+    fill(255, 255, 255, 180);
+    noStroke();
+    circle(0, 0, 15);
+    let ctx = drawingContext;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "yellow";
+
+    textAlign(CENTER, CENTER);
+    textSize(40);
     text("🪡", 0, 0);
+    ctx.shadowBlur = 0;
     pop();
     fill(255, 0, 0);
     noStroke();
     textAlign(LEFT);
     textSize(10);
-    // text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
+    //text("±" + nf(this.accuracy, 1, 1) + "m", diameter / 2 + 5, 0);
     pop();
   }
 }
@@ -344,10 +363,10 @@ class Cloth {
 function spawnCloths(lat, lng) {
   cloths = [];
   clusterGroups = [];
-  let MIN_CENTER_M = 18;
-  let MIN_RING_M = 20;
-  let MAX_CLOTHS = 15; // updated to match total number of images
-  let MAX_RING_M = 100;
+  let MIN_CENTER_M = 25;
+  let MIN_RING_M = 10;
+  let MAX_CLOTHS = 50; // updated to match total number of images
+  let MAX_RING_M = 150;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));
 
