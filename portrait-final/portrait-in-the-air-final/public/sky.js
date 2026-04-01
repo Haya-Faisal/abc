@@ -5,8 +5,8 @@ const gravity = 0.15;
 const upForce = -1; // lift applied to kite node
 const windAmp = 0.4; // how much the wind pushes sideways
 const windFreq = 0.007; // speed of wind
-const nodeM = 25; 
-const kiteM = 10; 
+const nodeM = 25;
+const kiteM = 10;
 const ROT_DAMPING = 0.92;
 const ROT_STIFF = 0.0000001;
 const WIND_TORQUE = 0.08;
@@ -27,7 +27,7 @@ if (
   location.hostname.toLowerCase().startsWith("browsercircus") ||
   location.hostname.toLowerCase().startsWith("www")
 ) {
-  socket = io({ path: "/haya/port-4230/socket.io" });
+  socket = io({ path: "/lesley/port-4290/socket.io" });
 } else {
   socket = io();
 }
@@ -65,20 +65,21 @@ function setup() {
   });
 
   // load all kites saved on the server
-fetch("kites")
-.then(function (r) {
-  return r.json();
-})
-.then(function (data) {
-  let limit = 10; 
-  let recentData = data.length > limit ? data.slice(data.length - limit) : data;
+  fetch("kites")
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (data) {
+      let limit = 10;
+      let recentData =
+        data.length > limit ? data.slice(data.length - limit) : data;
 
-  for (let i = 0; i < recentData.length; i++) {
-    kites.push(new Kite(recentData[i], i));
-  }
-  console.log("Loaded", recentData.length, "recent kites");
-  growCanvasIfNeeded();
-})
+      for (let i = 0; i < recentData.length; i++) {
+        kites.push(new Kite(recentData[i], i));
+      }
+      console.log("Loaded", recentData.length, "recent kites");
+      growCanvasIfNeeded();
+    });
 }
 
 function draw() {
@@ -101,11 +102,7 @@ function draw() {
     noStroke();
     textAlign(CENTER, CENTER);
     textSize(18);
-    text(
-      "waiting for the kites to come",
-      windowWidth / 2,
-      height * 0.4,
-    );
+    text("waiting for the kites to come", windowWidth / 2, height * 0.4);
   }
 }
 
