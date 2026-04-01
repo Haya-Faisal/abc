@@ -23,7 +23,7 @@ if (
   location.hostname.toLowerCase().startsWith("browsercircus") ||
   location.hostname.toLowerCase().startsWith("www")
 ) {
-  socket = io({ path: "/haya/port-4230/socket.io" });
+  socket = io({ path: "/lesley/port-4290/socket.io" });
 } else {
   socket = io();
 }
@@ -49,7 +49,7 @@ let mappa_options = {
 
 //icon imgs
 function preload() {
-  for (let i = 1; i <= 15; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
+  for (let i = 1; i <= 29; i++) imgs.push(loadImage("assets/" + i + ".JPG"));
   sound1 = loadSound("assets/stich.mp3");
 }
 
@@ -225,8 +225,8 @@ class MyPoint {
     this.accuracy = 0;
     this.heading = 0;
     this.emojiAdjustAngle = 0;
-    this.startFrame = frameCount;
-    this.bounceDuration = 60 * 5;
+    this.startFrame = frameCount; 
+    this.bounceDuration = 60 * 5; 
   }
   update() {
     this.x = this.goalX; // lerp(this.x, this.goalX, 0.2);
@@ -248,23 +248,23 @@ class MyPoint {
     strokeWeight(3);
     //circle(0, 0, this.size + sin(frameCount * 0.1) * 2);
     let bounceY = 0;
-
+    
     if (frameCount - this.startFrame < this.bounceDuration) {
-      bounceY = sin(frameCount * 0.15) * 8;
+      bounceY = sin(frameCount * 0.15) * 8; 
     } else {
       bounceY = 0;
     }
     push();
     rotate(radians(this.heading));
     rotate(this.emojiAdjustAngle);
-    translate(0, -12 + bounceY);
+    translate(0, -12+bounceY);
     textAlign(CENTER, CENTER);
     fill(255, 255, 255, 180);
     noStroke();
-    circle(0, 0, 15);
+    circle(0, 0, 15); 
     let ctx = drawingContext;
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "yellow";
+    ctx.shadowBlur = 20;        
+    ctx.shadowColor = 'yellow';  
 
     textAlign(CENTER, CENTER);
     textSize(40);
@@ -365,7 +365,7 @@ function spawnCloths(lat, lng) {
   clusterGroups = [];
   let MIN_CENTER_M = 25;
   let MIN_RING_M = 10;
-  let MAX_CLOTHS = 10; // updated to match total number of images
+  let MAX_CLOTHS = 50; // updated to match total number of images
   let MAX_RING_M = 150;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));

@@ -1,0 +1,33 @@
+body{
+    margin: 0;
+}
+
+canvas, #ui-layer, #p5-canvas-container {
+    touch-action: manipulation; /* 核心：禁用双击缩放，保留单击和滑动 */
+    /* -webkit-user-select: none;  防止长按弹出菜单 */
+    overflow: hidden;           /* 防止溢出滚动条 */
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 极其重要：防止因缩放导致的页面滚动 */
+    position: fixed;  /* 强制锁定背景 */
+  }
+  #requestOrientationButton {
+    background-color: rgba(30, 80, 50, 0.85);
+    border: none;
+    color: white;
+    padding: 20px 40px;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Press Start 2P", system-ui;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    position: fixed;
+    bottom: 50%;
+    left:25%
+} 
