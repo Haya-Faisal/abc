@@ -4,7 +4,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const app = express();
-const portHTTPS = 4290;
+const portHTTPS = 4230;
 const KITES_FILE = path.join(__dirname, "kites.json");
 // returning to the client anything that is
 // inside the public folder
@@ -21,7 +21,7 @@ const HTTPSserver = https.createServer(options, app);
 const { Server } = require("socket.io");
 const io = new Server(HTTPSserver);
 
-fs.writeFileSync('kites.json', JSON.stringify([])); 
+fs.writeFileSync("kites.json", JSON.stringify([]));
 console.log("Server started: Kite data has been cleared.");
 
 let currentlyConnected = [];
