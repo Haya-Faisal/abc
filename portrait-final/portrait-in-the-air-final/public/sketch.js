@@ -365,7 +365,7 @@ function spawnCloths(lat, lng) {
   clusterGroups = [];
   let MIN_CENTER_M = 25;
   let MIN_RING_M = 10;
-  let MAX_CLOTHS = 15; // updated to match total number of images
+  let MAX_CLOTHS = 20; // updated to match total number of images
   let MAX_RING_M = 150;
   let degLat = 1 / 111000;
   let degLng = 1 / (111000 * Math.cos((lat * Math.PI) / 180));
