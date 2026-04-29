@@ -41,15 +41,16 @@ function setup() {
     addMandalaLayer(data.url);
   });
 
-  canvas = createCanvas(480, 640);
+  canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("canvas-wrapper");
 
   let canvasDisplayHeight = window.innerHeight / 3;
   canvas.elt.style.height = canvasDisplayHeight + "px";
-  canvas.elt.style.width = canvasDisplayHeight * (480 / 640) + "px";
+  canvas.elt.style.width =
+    canvasDisplayHeight * (windowWidth / windowHeight) + "px";
 
   video = createCapture({ video: { facingMode: "environment" }, audio: false });
-  video.size(480, 640);
+  video.size(windowWidth, windowHeight);
   video.hide();
   background(0);
 
@@ -78,7 +79,7 @@ function setup() {
 function draw() {
   if (mode === "camera") {
     if (!snapped) {
-      image(video, 0, 0, 480, 640);
+      image(video, 0, 0, width, height);
     }
   }
 

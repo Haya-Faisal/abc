@@ -1,0 +1,224 @@
+body{
+    margin: 0;
+    overflow: hidden;
+}
+
+#main-wrapper{
+    width:100%;
+    /* margin-top: 50px; */
+    height: 100vh;
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+}
+
+#captureArea{
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+#canvas-wrapper{
+    /* margin: auto; */
+}
+
+
+button{
+    width: 50%;
+    height: 35px;
+    border-radius: 20px;
+ 
+}
+
+
+#sendButton{
+    visibility: hidden;
+    background-color: aquamarine;
+}
+#album{
+    height: 50vh;
+    background-color: rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    outline: 1px white dotted;
+}
+
+#album img{
+    width: 50%;
+}
+
+#album p{
+    font-family: sans-serif;
+    color: white;
+}
+
+#images{
+    overflow: scroll;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ─── Toast notification ───────────────────────────────────────────────────── */
+#pic-toast {
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #352620;
+    color: #FADFE0;
+    font-family: sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: 1.5px solid #FADFE0;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 9999;
+}
+
+#pic-toast.pic-toast-visible {
+    opacity: 1;
+}
+
+/* intro scene */
+#intro-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #FFF9F0;
+  text-align: center;
+  padding: 40px;
+}
+
+#intro-screen p {
+  font-family: sans-serif;
+  font-size: 22px;
+  color: #003049;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+#introButton {
+  padding: 14px 36px;
+  border-radius: 30px;
+  border: 2px solid #003049;
+  background-color: transparent;
+  color: #003049;
+  font-size: 16px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+#introButton:hover {
+  background-color: #003049;
+  color: #FFF9F0;
+}
+
+#captureButton {
+  position: fixed;
+  bottom: 30px;
+  left: calc(50% - 50px);
+  transform: translateX(-50%);
+  width: 64px !important;
+  height: 64px;
+  border-radius: 50% !important;
+  border: 3px solid #FFF9F0 !important;
+  background-color: rgba(255, 249, 240, 0.3) !important;
+  color: #FFF9F0;
+  cursor: pointer;
+  z-index: 20;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+#camera-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+#viewfinder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#viewfinder::before,
+#viewfinder::after,
+#viewfinder .corner-br,
+#viewfinder .corner-bl {
+  content: '';
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-color: #FFF9F0;
+  border-style: solid;
+  z-index: 10;
+}
+
+#viewfinder::before { top: 16px; left: 16px;  border-width: 3px 0 0 3px; }
+#viewfinder::after  { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
+#viewfinder .corner-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
+#viewfinder .corner-bl { bottom: 16px; left: 16px;  border-width: 0 0 3px 3px; }
+
+#canvas-wrapper canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover;
+  display: block;
+}
+
+#sendButton {
+  position: fixed;
+  bottom: 30px;
+  left: calc(50% + 50px);
+  width: 120px !important;
+  height: 64px;
+  border-radius: 32px !important;
+  border: 3px solid #FFF9F0 !important;
+  background-color: rgba(255, 249, 240, 0.3) !important;
+  color: #FFF9F0;
+  cursor: pointer;
+  z-index: 20;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  visibility: hidden;
+}
+
+#toCamera {
+  position: fixed;
+  bottom: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto !important;
+  padding: 0 28px;
+  height: 48px;
+  border-radius: 30px !important;
+  border: 2px solid #003049 !important;
+  background-color: #FFF9F0 !important;
+  color: #003049;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  z-index: 20;
+}

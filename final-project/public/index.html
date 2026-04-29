@@ -20,11 +20,30 @@
 <body>
 
   <div id="main-wrapper">
-    <div id="camera-screen">
+    <!-- <div id="camera-screen">
       <div id="canvas-wrapper"></div>
       <button id="captureButton">SNAP!</button>
       <button id="sendButton">Send to Server</button>
+    </div> -->
+    <div id="camera-screen">
+  <div id="canvas-wrapper"></div>
+
+  <div class="overlay">
+
+    <div class="scanner-container">
+      <div class="scanner-frame"></div>
     </div>
+
+    <div class="controls">
+      <button id="uploadButton">
+        <!-- <span>Upload From Gallery</span> -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+      
+      <button id="captureButton"></button>
+    </div>
+  </div>
+</div>
     
 
     <div id="mandala-screen" style="display:none;">

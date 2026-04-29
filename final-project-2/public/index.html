@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <link rel="manifest" href="manifest.json" />
+
+  <title>IGP Generator</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="lib/p5.js"></script>
+  <script src="lib/p5.sound.js"></script>
+  
+  <script src="socket.io/socket.io.js"></script>  
+</head>
+
+<body>
+
+  <div id="main-wrapper">
+
+    <!--  Intro -->
+    <div id="intro-screen">
+      <!-- <p>Take a photo of something beautiful.<br>It will become part of a shared pattern.</p> -->
+      <p>Islamic Geometric Patterns are a geometric system defined by a continuous network of overlapping stars and polygons.</p>
+      <p>Each repetition of these patterns symbolizes the endless nature of the universe and the continuous presence of the divine.</p>
+      <!-- https://irfanqureshi.art/geometry-in-islamic-art-unveiling-divine-patterns/#:~:text=These%20patterns%20symbolize%20the%20infinite%20nature%20of%20creation%2C,universe%20and%20the%20continuous%20presence%20of%20the%20divine -->
+      <button id="introButton">Continue</button>
+    </div>
+
+    <!--  Camera -->
+    <div id="camera-screen" style="display: none;">
+      <div id="viewfinder">
+        <div id="canvas-wrapper"></div>
+        <div class="corner-br"></div>
+        <div class="corner-bl"></div>
+      </div>
+      <button id="captureButton">SNAP!</button>
+      <button id="sendButton">Send to Server</button>
+    </div>
+
+    <!--  Pattern -->
+    <div id="mandala-screen" style="display:none;">
+      <!-- p5 draws its canvas here via switchToPattern() -->
+        <button id="toCamera">Take Photo</button>
+    </div>
+
+  </div>
+
+  <audio id="camSound" src="231286__ulose2piranha__5dmkii-shutter-sound.wav"></audio>
+  <script src="script.js"></script>
+</body>
+
+</html>
