@@ -50,7 +50,10 @@ function saveTiles() {
   fs.writeFileSync(TILES_FILE, JSON.stringify(tiles, null, 2), "utf8");
 }
 
-// ── Static files ─────────────────────────────────────────────────────────────
+// ── Track active user sessions ────────────────────────────────────────────────
+const activeUsers = new Map(); // { userId: { socketId, lastTouchX, lastTouchY, lastUpdate } }
+
+// ── Static files ───────────────────────────��─────────────────────────────────
 app.use(express.static("public"));
 
 // ── Photo upload (existing) ───────────────────────────────────────────────────
@@ -114,8 +117,70 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("new-tile", record);
   });
 
+  // ── NEW: Handle user touch position sync ────────────────────────────────────────
+  socket.on("user-touch-move", (data) => {
+    const { userId, x, y } = data;
+
+    // Validate touch data
+    if (!userId || typeof x !== "number" || typeof y !== "number") {
+      console.warn("Rejected malformed touch data:", data);
+      return;
+    }
+
+    // Track user's current touch position on server
+    if (activeUsers.has(userId)) {
+      const user = activeUsers.get(userId);
+      user.lastTouchX = x;
+      user.lastTouchY = y;
+      user.lastUpdate = Date.now();
+    } else {
+      activeUsers.set(userId, {
+        socketId: socket.id,
+        lastTouchX: x,
+        lastTouchY: y,
+        lastUpdate: Date.now(),
+      });
+    }
+
+    // Broadcast to all OTHER clients (not the sender)
+    socket.broadcast.emit("user-touch-move", {
+      userId: userId,
+      x: x,
+      y: y,
+    });
+  });
+
+  // ── NEW: Handle user stop touching ─────────────────────────────────────────────
+  socket.on("user-touch-end", (data) => {
+    const { userId } = data;
+
+    if (!userId) {
+      console.warn("Rejected malformed touch-end data:", data);
+      return;
+    }
+
+    // Remove user from active tracking
+    if (activeUsers.has(userId)) {
+      activeUsers.delete(userId);
+    }
+
+    // Broadcast to all OTHER clients
+    socket.broadcast.emit("user-touch-end", {
+      userId: userId,
+    });
+  });
+
   socket.on("disconnect", () => {
     console.log("someone disconnected", socket.id);
+
+    // Clean up: remove all users associated with this socket
+    for (const [userId, userData] of activeUsers.entries()) {
+      if (userData.socketId === socket.id) {
+        activeUsers.delete(userId);
+        // Notify all clients that this user stopped
+        io.emit("user-touch-end", { userId: userId });
+      }
+    }
   });
 });
 

@@ -546,3 +546,11 @@ button{
 #pan-hint.hidden {
   opacity: 0;
 }
+
+#mandala-screen canvas {
+  pointer-events: none;
+}
+
+#igp-modal {
+  pointer-events: auto;
+}

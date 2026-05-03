@@ -375,5 +375,109 @@
     "tiling": "rhombitrihexagonal",
     "mainColor": "#1a4a8a",
     "ts": 1777787217514
+  },
+  {
+    "col": 102,
+    "row": 190,
+    "theta": 0.812302815260951,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777789028391
+  },
+  {
+    "col": 110,
+    "row": 241,
+    "theta": 1.1172222030473136,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777789034442
+  },
+  {
+    "col": 162,
+    "row": 170,
+    "theta": 1.1172222030473136,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777789037121
+  },
+  {
+    "col": 145,
+    "row": 202,
+    "theta": 0.6262029801094784,
+    "tiling": "squareOctagon",
+    "mainColor": "#d19d01",
+    "ts": 1777790579807
+  },
+  {
+    "col": 168,
+    "row": 239,
+    "theta": 0.17453292519943295,
+    "tiling": "squareOctagon",
+    "mainColor": "#d19d01",
+    "ts": 1777790623423
+  },
+  {
+    "col": 152,
+    "row": 318,
+    "theta": 0.35610573820455127,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777790634007
+  },
+  {
+    "col": 156,
+    "row": 270,
+    "theta": 1.3962634015954636,
+    "tiling": "rhombitrihexagonal",
+    "mainColor": "#99244f",
+    "ts": 1777790648201
+  },
+  {
+    "col": 119,
+    "row": 334,
+    "theta": 0.35610573820455127,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777790654150
+  },
+  {
+    "col": 226,
+    "row": 272,
+    "theta": 0.35610573820455127,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a4a8a",
+    "ts": 1777790674210
+  },
+  {
+    "col": 82,
+    "row": 216,
+    "theta": 1.1326144355909253,
+    "tiling": "rhombitrihexagonal",
+    "mainColor": "#ffb5af",
+    "ts": 1777799594095
+  },
+  {
+    "col": 105,
+    "row": 361,
+    "theta": 0.45553093477052004,
+    "tiling": "squareOctagon",
+    "mainColor": "#1a8950",
+    "ts": 1777799780917
+  },
+  {
+    "col": 194,
+    "row": 382,
+    "theta": 0.7853981633974483,
+    "tiling": "square",
+    "mainColor": "#945959",
+    "ts": 1777799805492
+  },
+  {
+    "col": 190,
+    "row": 266,
+    "theta": 0.26287675153494916,
+    "tiling": "squareOctagon",
+    "mainColor": "#93e3fd",
+    "ts": 1777804012179
   }
 ]
