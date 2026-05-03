@@ -1,7 +1,5 @@
-const express = require("express");
-const https = require("https");
-const fs = require("fs");
-const crypto = require("crypto");
+const http = require("http");
+const server = http.createServer(app);
 
 const app = express();
 const portHTTPS = 4230;
@@ -14,20 +12,10 @@ const options = {
 let HTTPSserver = https.createServer(options, app);
 
 const { Server } = require("socket.io");
-const io = new Server(HTTPSserver);
+const io = new Server(server);
 
 // ── Photos (existing) ────────────────────────────────────────────────────────
-let photos = [];
-let dataText = fs.readFileSync("photos.json", "utf8");
-photos = JSON.parse(dataText);
-photos = photos.filter((p) => {
-  try {
-    fs.accessSync("public/" + p.url);
-    return true;
-  } catch {
-    return false;
-  }
-});
+
 fs.writeFileSync("photos.json", JSON.stringify(photos, null, 2), "utf8");
 
 // ── Tiles (new) ───────────────────────────────────────────────────────────────
@@ -78,7 +66,6 @@ io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
   // Send existing state to the new client
-  socket.emit("historic-photos", photos);
   socket.emit("historic-tiles", tiles);
 
   // Client placed a new tile
@@ -184,6 +171,5 @@ io.on("connection", (socket) => {
   });
 });
 
-HTTPSserver.listen(portHTTPS, () => {
-  console.log("HTTPS Server started at port", portHTTPS);
-});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
