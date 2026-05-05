@@ -32,21 +32,19 @@ const PIXEL_STAGGER = 12;
 let activeCells = [];
 
 // Ripples
-// Each ripple: { x, y, startTime }
-const RIPPLE_SPEED = 280; // px per second
+
+const RIPPLE_SPEED = 280;
 const RIPPLE_FORCE = 9;
-const RIPPLE_WIDTH = 40; // wave band width
-const RIPPLE_DURATION = 1400; // ms before ripple dies
+const RIPPLE_WIDTH = 40;
+const RIPPLE_DURATION = 1400;
 let ripples = [];
 
-//  Long press
 let longPressTimer = null;
 let longPressX = 0;
 let longPressY = 0;
-const LONG_PRESS_MS = 500; // ms to hold before triggering
+const LONG_PRESS_MS = 500;
 
 // Pan / virtual camera
-// World is 4× the screen. Pan offsets how much of the world is visible.
 let panX = 0,
   panY = 0; // current pan offset (pixels)
 let panVX = 0,
@@ -63,23 +61,22 @@ let previewDragX = 0;
 let previewDragY = 0;
 let previewLastX = null;
 let previewLastY = null;
-// Preview segment cache — recomputed only when theta or tiling changes
 let previewSegCache = null;
 let previewSegKey = null;
 let previewBBox = null;
 const TILINGS = ["squareOctagon", "rhombitrihexagonal"];
 
-// ─── Touch Position Sync ───────────────────────────────────────────────────────
-const TOUCH_SYNC_THROTTLE = 50; // ms — send position updates every 50ms
+//Touch Position Sync
+const TOUCH_SYNC_THROTTLE = 50;
 let lastTouchSyncTime = 0;
 const remoteUsers = new Map(); // { userId: { x, y, lastUpdate, isActive } }
 let userId = null;
 
-// ─── Web Audio API ────────────────────────────────────────────────────────────
+//  Web Audio API
 let audioContext = null;
 let masterGain = null;
 let lastPluckTime = 0;
-const PLUCK_COOLDOWN = 100; // ms between pluck sounds
+const PLUCK_COOLDOWN = 100;
 
 // AUDIO INITIALIZATION
 function initAudio() {
@@ -157,7 +154,6 @@ function centroid(verts) {
   return { x: cx / verts.length, y: cy / verts.length };
 }
 
-// Returns array of line segments [{ax,ay,bx,by}] for one polygon- then used to rasterize
 function hankinLines(verts, theta) {
   const cen = centroid(verts);
   const lines = [];
@@ -205,15 +201,6 @@ function hankinLines(verts, theta) {
 function buildUnitPolygons(tilingType, size) {
   const polys = [];
 
-  // if (tilingType === "square") {
-  //   const h = size / 2;
-  //   polys.push([
-  //     { x: -h, y: -h },
-  //     { x: h, y: -h },
-  //     { x: h, y: h },
-  //     { x: -h, y: h },
-  //   ]);
-  // } else
   if (tilingType === "squareOctagon") {
     // Octagon
     const r8 = size / (2 * Math.cos(Math.PI / 8));
@@ -241,7 +228,7 @@ function buildUnitPolygons(tilingType, size) {
       ]);
     }
   } else if (tilingType === "rhombitrihexagonal") {
-    // 3-4-6-4 tiling unit: one central hexagon + 6 surrounding squares + 6 triangles
+    //  one central hexagon + 6 surrounding squares + 6 triangles
     // Central hexagon
     const hex = [];
     const rH = size * 0.38;
@@ -319,7 +306,6 @@ function rasterizeTile(theta, tilingType) {
   const RENDER_SIZE = 512;
 
   // Step 1: generate all segments at unit scale (size=1, centered at 0,0)
-  // so we can find the TRUE bounding box including extended star points
   const unitPolys = buildUnitPolygons(tilingType, 1.0);
   const allSegs = [];
   for (const verts of unitPolys) {
@@ -397,7 +383,6 @@ function setup() {
     socket = io();
   }
 
-  // Generate unique user ID
   userId = "user_" + Math.random().toString(36).substr(2, 9);
 
   // Listen for historic tiles
@@ -454,7 +439,6 @@ function setup() {
 
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("mandala-screen");
-  // background("#0a0a0f");
 
   const introBtn = document.querySelector("#introButton");
   if (introBtn)
@@ -466,9 +450,6 @@ function setup() {
   // Initialize audio on first user interaction
   document.addEventListener("click", initAudio, { once: true });
   document.addEventListener("touchstart", initAudio, { once: true });
-
-  // Long press anywhere on the canvas triggers the modal
-  // (handled in touchStarted / mousePressed)
 
   noLoop();
 }
@@ -503,7 +484,7 @@ function draw() {
     const curX = homeX + cell.dx;
     const curY = homeY + cell.dy;
 
-    // ── Repulsion (own touch)
+    // Repulsion (own touch)
     if (isTouching) {
       const distX = curX - touchX,
         distY = curY - touchY;
@@ -519,7 +500,7 @@ function draw() {
       }
     }
 
-    // ── Repulsion (remote users) ────────────────────────────────────────────────────────
+    // Repulsion (remote users)
     for (const [remoteUserId, remoteUser] of remoteUsers) {
       if (remoteUser.isActive) {
         const distX = curX - remoteUser.x,
@@ -533,7 +514,7 @@ function draw() {
       }
     }
 
-    // ── Ripple ───────────────────────────────────────────────────────────
+    // Ripple
     if (hasRipple) {
       for (const r of ripples) {
         const elapsed = now - r.startTime;
@@ -557,7 +538,7 @@ function draw() {
       }
     }
 
-    // ── Spring + damping ─────────────────────────────────────────────────
+    // Spring + damping
     cell.vx += -cell.dx * 0.16;
     cell.vy += -cell.dy * 0.16;
     cell.vx *= DAMPING;
@@ -613,9 +594,6 @@ function draw() {
     noLoop();
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Draw own touch indicator (bright ✦)
-// touchX/touchY are world coords — convert to screen by adding panX/panY
 function drawOwnTouchIndicator(wx, wy) {
   const sx = wx + panX;
   const sy = wy + panY;
@@ -628,8 +606,6 @@ function drawOwnTouchIndicator(wx, wy) {
   pop();
 }
 
-// Draw remote touch indicator (translucent ✦)
-// x/y stored as world coords — convert to screen
 function drawRemoteTouchIndicator(wx, wy) {
   const sx = wx + panX;
   const sy = wy + panY;
@@ -642,9 +618,7 @@ function drawRemoteTouchIndicator(wx, wy) {
   pop();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // GRID
-// ═══════════════════════════════════════════════════════════════════════════
 function initGrid() {
   worldW = width * 4;
   worldH = height * 4;
@@ -782,9 +756,7 @@ function placeTileAt(
   loop();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // DRAW HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
 function drawGridDots() {
   // Only draw dots visible in current view (perf optimisation)
   const startCol = Math.max(0, Math.floor(-panX / CELL_SIZE) - 1);
@@ -829,9 +801,7 @@ function drawPixelCell(cell) {
   rect(cell.x + cell.dx, cell.y + cell.dy, CELL_SIZE - 1, CELL_SIZE - 1);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // TOUCH / MOUSE
-// ═══════════════════════════════════════════════════════════════════════════
 // Convert screen coords → world coords
 function screenToWorld(sx, sy) {
   return { x: sx - panX, y: sy - panY };
@@ -926,7 +896,6 @@ function touchMoved() {
       ripples.push({ x: touchX, y: touchY, startTime: millis() });
     }
 
-    // ── Throttled sync of touch position to other users ────────────────────────────────
     const now = Date.now();
     if (now - lastTouchSyncTime > TOUCH_SYNC_THROTTLE) {
       socket.emit("user-touch-move", {
@@ -965,7 +934,6 @@ function touchEnded() {
     checkShatter(touchX, touchY);
   }
 
-  // ── Notify other users that we stopped touching ────────────────────────────────────
   socket.emit("user-touch-end", {
     userId: userId,
   });
@@ -1040,7 +1008,6 @@ function mouseDragged() {
   }
 }
 
-// ─── Shatter ──────────────────────────────────────────────────────────────────
 function checkShatter(x, y) {
   // x,y already in world coords
   const col = Math.floor(x / CELL_SIZE);
@@ -1077,9 +1044,7 @@ function shatterTile(tileId) {
   loop();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // SCREEN SWITCHING
-// ═══════════════════════════════════════════════════════════════════════════
 function clampPan() {
   panX = Math.min(0, Math.max(-(worldW - width), panX));
   panY = Math.min(0, Math.max(-(worldH - height), panY));
@@ -1098,9 +1063,7 @@ function windowResized() {
   redraw();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // IGP MODAL
-// ═══════════════════════════════════════════════════════════════════════════
 function openIGPModal() {
   igpModalOpen = true;
   previewDragX = igpTheta; // start from current theta

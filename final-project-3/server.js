@@ -16,21 +16,7 @@ let HTTPSserver = https.createServer(options, app);
 const { Server } = require("socket.io");
 const io = new Server(HTTPSserver);
 
-// ── Photos (existing) ────────────────────────────────────────────────────────
-let photos = [];
-let dataText = fs.readFileSync("photos.json", "utf8");
-photos = JSON.parse(dataText);
-photos = photos.filter((p) => {
-  try {
-    fs.accessSync("public/" + p.url);
-    return true;
-  } catch {
-    return false;
-  }
-});
-fs.writeFileSync("photos.json", JSON.stringify(photos, null, 2), "utf8");
-
-// ── Tiles (new) ───────────────────────────────────────────────────────────────
+// Tiles
 // Each tile: { col, row, angleDeg, mainColor, ts }
 let tiles = [];
 const TILES_FILE = "tiles.json";
@@ -50,35 +36,18 @@ function saveTiles() {
   fs.writeFileSync(TILES_FILE, JSON.stringify(tiles, null, 2), "utf8");
 }
 
-// ── Track active user sessions ────────────────────────────────────────────────
+// Track active user sessions
 const activeUsers = new Map(); // { userId: { socketId, lastTouchX, lastTouchY, lastUpdate } }
 
-// ── Static files ───────────────────────────��─────────────────────────────────
+// Static files\
 app.use(express.static("public"));
 
-// ── Photo upload (existing) ───────────────────────────────────────────────────
-app.post("/upload-photo", (req, res) => {
-  console.log("someone uploaded a photo");
-  const filename = crypto.randomUUID() + ".png";
-  const filepath = "public/uploads/" + filename;
-  const writeStream = fs.createWriteStream(filepath);
-  req.pipe(writeStream);
-
-  req.on("end", () => {
-    res.sendStatus(200);
-    const imageURL = "uploads/" + filename;
-    photos.push({ ts: Date.now(), url: imageURL });
-    fs.writeFileSync("photos.json", JSON.stringify(photos, null, 2), "utf8");
-    io.emit("new-photo", { url: imageURL });
-  });
-});
-
-// ── Socket ────────────────────────────────────────────────────────────────────
+//  Socket
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
   // Send existing state to the new client
-  socket.emit("historic-photos", photos);
+  // socket.emit("historic-photos", photos);
   socket.emit("historic-tiles", tiles);
 
   // Client placed a new tile
@@ -117,7 +86,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("new-tile", record);
   });
 
-  // ── NEW: Handle user touch position sync ────────────────────────────────────────
+  // Handle user touch position sync
   socket.on("user-touch-move", (data) => {
     const { userId, x, y } = data;
 
@@ -150,7 +119,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // ── NEW: Handle user stop touching ─────────────────────────────────────────────
+  //  Handle user stop touching
   socket.on("user-touch-end", (data) => {
     const { userId } = data;
 
