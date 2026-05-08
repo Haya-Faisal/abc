@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAQSH — Haya</title>
+<style>
+  /* ========================
+     CSS VARIABLES & RESET
+  ======================== */
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8CC7E;
+    --gold-pale: #F5E6B8;
+    --deep-blue: #0D1B2A;
+    --navy: #112233;
+    --terracotta: #B85C38;
+    --sand: #D4B896;
+    --cream: #F2EDE4;
+    --charcoal: #1A1A1A;
+    --off-white: #EDE8DF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #080D13;
+    font-family: 'Georgia', serif;
+    cursor: none;
+  }
+
+  /* ========================
+     CUSTOM CURSOR
+  ======================== */
+  #cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+    mix-blend-mode: screen;
+  }
+
+  #cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  }
+
+  /* ========================
+     THREE.JS CANVAS
+  ======================== */
+  #three-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  /* ========================
+     OVERLAY UI LAYER
+  ======================== */
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* ========================
+     MAIN TITLE — NAQSH
+  ======================== */
+  #title-naqsh {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    font-size: clamp(96px, 14vw, 200px);
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(201,168,76,0.5);
+    text-stroke: 1px rgba(201,168,76,0.5);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeTitle 3s ease 1.2s forwards;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Gold fill reveal */
+  #title-naqsh::after {
+    content: 'NAQSH';
+    position: absolute;
+    top: 0; left: 0;
+    color: var(--gold);
+    -webkit-text-stroke: 0;
+    clip-path: inset(0 100% 0 0);
+    animation: revealGold 2.4s cubic-bezier(0.77,0,0.175,1) 2.2s forwards;
+  }
+
+  @keyframes revealGold {
+    to { clip-path: inset(0 0% 0 0); }
+  }
+
+  @keyframes fadeTitle {
+    to { opacity: 1; }
+  }
+
+  /* ========================
+     ARABIC SUBTITLE — نقش
+  ======================== */
+  #arabic-naqsh {
+    position: absolute;
+    top: calc(50% + clamp(60px, 8vw, 120px));
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Palatino Linotype', serif;
+    font-size: clamp(25px, 2.2vw, 32px);
+    letter-spacing: 0.6em;
+    color: rgba(201,168,76);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 2s ease 3s forwards;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* ========================
+     DESIGNER NAME — vertical left
+  ======================== */
+  #name-vertical {
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: center center;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(9px, 1vw, 12px);
+    letter-spacing: 0.45em;
+    color: rgba(201,168,76,0.45);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 2s ease 2.5s forwards;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* ========================
+     TOP-RIGHT CORNER INFO
+  ======================== */
+  #corner-info {
+    position: absolute;
+    top: 40px;
+    right: 48px;
+    text-align: right;
+    opacity: 0;
+    animation: fadeIn 2s ease 2.8s forwards;
+  }
+
+  #corner-info .label {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(8px, 0.85vw, 11px);
+    letter-spacing: 0.35em;
+    color: rgba(201,168,76,0.5);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  #corner-info .author {
+    display: block;
+    font-family: 'Palatino Linotype', serif;
+    font-size: clamp(21px, 1.1vw, 15px);
+    letter-spacing: 0.12em;
+    color: rgba(242,237,228);
+    text-transform: uppercase;
+  }
+
+  /* ========================
+     BOTTOM LEFT — DESCRIPTION
+  ======================== */
+  #bottom-desc {
+    position: absolute;
+    bottom: 44px;
+    left: 48px;
+    max-width: 420px;
+    opacity: 0;
+    animation: fadeIn 2s ease 3.4s forwards;
+  }
+
+  #bottom-desc .desc-line {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(15px, 0.75vw, 10px);
+    letter-spacing: 0.3em;
+    color: rgba(201,168,76);
+    text-transform: uppercase;
+    line-height: 2.2;
+  }
+
+  /* ========================
+     THIN HORIZONTAL LINE
+  ======================== */
+  .h-line {
+    position: absolute;
+    left: 48px;
+    right: 48px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    opacity: 0;
+    animation: fadeIn 1.5s ease 4s forwards;
+  }
+
+  .h-line.top { top: 90px; }
+  .h-line.bottom { bottom: 90px; }
+
+  /* ========================
+     POSTER PLACEHOLDER
+  ======================== */
+  .poster-placeholder {
+    position: absolute;
+    /* Positioned via JS or manually — sits in 3D scene via Three.js
+       This HTML version is a fallback overlay element */
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(120px, 14vw, 200px);
+    height: clamp(160px, 19vw, 280px);
+    border: 1px solid rgba(201,168,76,0.25);
+    background: rgba(13,27,42,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeIn 2s ease 4.5s forwards;
+    backdrop-filter: blur(4px);
+    pointer-events: all;
+    cursor: default;
+  }
+
+  .poster-placeholder span {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: rgba(201,168,76,0.4);
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  /* ========================
+     DIAGONAL ACCENT LINE
+  ======================== */
+  #diag-line {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeIn 2s ease 4.2s forwards;
+  }
+
+  /* ========================
+     KEYFRAMES
+  ======================== */
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* ========================
+     LOADING VEIL
+  ======================== */
+  #veil {
+    position: fixed;
+    inset: 0;
+    background: #080D13;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.2s ease;
+  }
+
+  #veil.hidden { opacity: 0; pointer-events: none; }
+
+  #veil-text {
+    font-family: 'Palatino Linotype', serif;
+    font-size: 11px;
+    letter-spacing: 0.6em;
+    color: rgba(201,168,76,0.5);
+    text-transform: uppercase;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading veil -->
+<div id="veil"><span id="veil-text">Loading</span></div>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Three.js canvas -->
+<canvas id="three-canvas"></canvas>
+
+<!-- SVG diagonal accent -->
+<svg id="diag-line" viewBox="0 0 1000 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9;">
+  <line x1="0" y1="600" x2="1000" y2="0" stroke="rgba(201,168,76,0.07)" stroke-width="1"/>
+  <line x1="0" y1="580" x2="420" y2="0" stroke="rgba(201,168,76,0.04)" stroke-width="1"/>
+  <line x1="600" y1="600" x2="1000" y2="20" stroke="rgba(201,168,76,0.04)" stroke-width="1"/>
+</svg>
+
+<!-- Overlay UI -->
+<div id="overlay">
+
+  <!-- Main title -->
+  <div id="title-naqsh">NAQSH</div>
+
+  <!-- Arabic -->
+  <div id="arabic-naqsh">نقش</div>
+
+  <!-- Vertical name left -->
+  <!-- <div id="name-vertical">Haya</div> -->
+
+  <!-- Top right info -->
+  <div id="corner-info">
+    <!-- <span class="label">Interactive Exhibition</span> -->
+    <span class="author">Haya</span>
+  </div>
+
+  <!-- Bottom left description -->
+  <div id="bottom-desc">
+    <span class="desc-line">Islamic Geometric Patterns</span>
+    <!-- <span class="desc-line">Generation & Interaction</span>
+    <span class="desc-line">Infinity · Abstraction · Aniconism</span> -->
+  </div>
+
+  <!-- Horizontal lines -->
+  <div class="h-line top"></div>
+  <div class="h-line bottom"></div>
+
+  <!-- ============================================
+       POSTER PLACEHOLDER
+       Replace the inner content with your image:
+       <img src="your-poster.jpg" style="width:100%;height:100%;object-fit:cover;" />
+  ============================================ -->
+  <div class="poster-placeholder">
+    <span>QR</span>
+  </div>
+
+</div>
+
+<!-- Three.js from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* =====================================================
+   NAQSH — Three.js Interactive Exhibition Poster
+   Haya
+   ===================================================== */
+
+// ─── SCENE SETUP ───────────────────────────────────────
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x080D13, 0.035);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 8);
+
+// ─── COLOUR PALETTE ────────────────────────────────────
+const GOLD      = 0xC9A84C;
+const GOLD_PALE = 0xF5E6B8;
+const DEEP_BLUE = 0x0D1B2A;
+const TERRACOTTA= 0xB85C38;
+const SAND      = 0xD4B896;
+const CREAM     = 0xF2EDE4;
+const CHARCOAL  = 0x1A1A1A;
+
+// ─── LIGHTING ──────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0x1A2A3A, 0.8);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xC9A84C, 0.9);
+keyLight.position.set(5, 8, 5);
+keyLight.castShadow = true;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x2244AA, 0.4);
+fillLight.position.set(-6, -3, 4);
+scene.add(fillLight);
+
+const rimLight = new THREE.PointLight(0xB85C38, 1.2, 20);
+rimLight.position.set(-4, 2, -3);
+scene.add(rimLight);
+
+const topLight = new THREE.PointLight(0xF5E6B8, 0.6, 15);
+topLight.position.set(0, 8, 2);
+scene.add(topLight);
+
+// ─── ISLAMIC PATTERN TEXTURE GENERATOR ─────────────────
+// Generates procedural star/tessellation patterns onto a canvas
+function makeIslamicTexture(size, starPoints, fg, bg, lineColor) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+
+  // Background
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+
+  const cx = size / 2, cy = size / 2;
+  const n = starPoints;
+  const outerR = size * 0.44;
+  const innerR = outerR * 0.42;
+
+  // Helper: draw a star polygon
+  function drawStar(x, y, r1, r2, pts, rotation) {
+    ctx.beginPath();
+    for (let i = 0; i < pts * 2; i++) {
+      const angle = (i * Math.PI / pts) + rotation;
+      const r = i % 2 === 0 ? r1 : r2;
+      if (i === 0) ctx.moveTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
+      else ctx.lineTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
+    }
+    ctx.closePath();
+  }
+
+  // Central star
+  drawStar(cx, cy, outerR, innerR, n, -Math.PI / 2);
+  ctx.fillStyle = fg;
+  ctx.fill();
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = size * 0.005;
+  ctx.stroke();
+
+  // Decorative connecting lines (Hankin-inspired)
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = size * 0.003;
+  ctx.globalAlpha = 0.6;
+  for (let i = 0; i < n; i++) {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    const nextAngle = ((i + 1) * 2 * Math.PI / n) - Math.PI / 2;
+    const ax = cx + outerR * Math.cos(angle);
+    const ay = cy + outerR * Math.sin(angle);
+    const bx = cx + outerR * Math.cos(nextAngle);
+    const by = cy + outerR * Math.sin(nextAngle);
+    // Line from corner to midpoint area
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(cx + (outerR * 0.7) * Math.cos(angle + Math.PI / n),
+               cy + (outerR * 0.7) * Math.sin(angle + Math.PI / n));
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Outer ring of small stars
+  const count = n;
+  const ringR = outerR * 1.6;
+  const smallR1 = size * 0.07;
+  const smallR2 = smallR1 * 0.38;
+  for (let i = 0; i < count; i++) {
+    const a = (i * 2 * Math.PI / count) - Math.PI / 2;
+    const sx = cx + ringR * Math.cos(a);
+    const sy = cy + ringR * Math.sin(a);
+    if (sx < 0 || sx > size || sy < 0 || sy > size) continue;
+    drawStar(sx, sy, smallR1, smallR2, 6, a);
+    ctx.fillStyle = fg;
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.stroke();
+  }
+
+  // Fine grid lines
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = size * 0.0015;
+  ctx.globalAlpha = 0.15;
+  const step = size / 8;
+  for (let x = 0; x < size; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
+  }
+  for (let y = 0; y < size; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Subtle radial overlay
+  const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.6);
+  radGrad.addColorStop(0, 'rgba(255,255,255,0.04)');
+  radGrad.addColorStop(1, 'rgba(0,0,0,0.35)');
+  ctx.fillStyle = radGrad;
+  ctx.fillRect(0, 0, size, size);
+
+  return new THREE.CanvasTexture(c);
+}
+
+// ─── TESSELLATION TEXTURE (secondary pattern) ──────────
+function makeTessellationTexture(size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#0D1B2A';
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.strokeStyle = 'rgba(201,168,76,0.55)';
+  ctx.lineWidth = 1.5;
+
+  const tile = size / 6;
+  // Hexagonal-ish grid
+  for (let row = -1; row < 8; row++) {
+    for (let col = -1; col < 8; col++) {
+      const cx = col * tile + (row % 2 === 0 ? 0 : tile * 0.5);
+      const cy = row * tile * 0.866;
+      // Hexagon
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI / 3) - Math.PI / 6;
+        const x = cx + (tile * 0.48) * Math.cos(a);
+        const y = cy + (tile * 0.48) * Math.sin(a);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      // Inner star
+      ctx.beginPath();
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < 12; i++) {
+        const a = (i * Math.PI / 6) - Math.PI / 6;
+        const r = i % 2 === 0 ? tile * 0.2 : tile * 0.1;
+        const x = cx + r * Math.cos(a);
+        const y = cy + r * Math.sin(a);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // vignette
+  const vg = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size*0.7);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.5)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, size, size);
+
+  return new THREE.CanvasTexture(c);
+}
+
+// ─── FLOATING PANELS ────────────────────────────────────
+const panels = [];
+
+function makeMat(tex, color, opacity, roughness, metalness) {
+  return new THREE.MeshStandardMaterial({
+    map: tex || null,
+    color: color,
+    transparent: true,
+    opacity: opacity,
+    roughness: roughness,
+    metalness: metalness,
+    side: THREE.DoubleSide,
+  });
+}
+
+// Main large left panel — Islamic star pattern
+const panelGeoL = new THREE.PlaneGeometry(4.2, 5.8);
+const texL = makeIslamicTexture(1024, 12, '#2A3A50', '#0A1520', 'rgba(201,168,76,0.9)');
+const matL = makeMat(texL, 0xffffff, 0.88, 0.6, 0.3);
+const meshL = new THREE.Mesh(panelGeoL, matL);
+meshL.position.set(-3.8, 0.4, -1.5);
+meshL.rotation.y = 0.32;
+meshL.rotation.z = -0.04;
+meshL.castShadow = true;
+meshL.receiveShadow = true;
+scene.add(meshL);
+panels.push({ mesh: meshL, floatOffset: 0, floatSpeed: 0.38, rotSpeed: 0.0004 });
+
+// Right tall narrow panel — terracotta/sand tone
+const panelGeoR = new THREE.PlaneGeometry(2.6, 6.2);
+const texR = makeIslamicTexture(512, 8, '#5A3020', '#2A1510', 'rgba(212,184,150,0.85)');
+const matR = makeMat(texR, 0xffffff, 0.82, 0.7, 0.2);
+const meshR = new THREE.Mesh(panelGeoR, matR);
+meshR.position.set(4.0, -0.2, -2.5);
+meshR.rotation.y = -0.28;
+meshR.rotation.z = 0.05;
+meshR.castShadow = true;
+scene.add(meshR);
+panels.push({ mesh: meshR, floatOffset: Math.PI * 0.6, floatSpeed: 0.31, rotSpeed: -0.0003 });
+
+// Small top-center floating card — tessellation
+const panelGeoT = new THREE.PlaneGeometry(2.2, 2.8);
+const texT = makeTessellationTexture(512);
+const matT = makeMat(texT, 0xffffff, 0.78, 0.5, 0.4);
+const meshT = new THREE.Mesh(panelGeoT, matT);
+meshT.position.set(0.8, 3.4, -0.8);
+meshT.rotation.y = -0.18;
+meshT.rotation.z = 0.08;
+scene.add(meshT);
+panels.push({ mesh: meshT, floatOffset: Math.PI * 0.3, floatSpeed: 0.44, rotSpeed: 0.0005 });
+
+// Small bottom-left accent card
+const panelGeoB = new THREE.PlaneGeometry(1.8, 1.4);
+const texB = makeIslamicTexture(256, 6, '#C9A84C', '#0A0E14', 'rgba(245,230,184,0.9)');
+const matB = makeMat(texB, 0xffffff, 0.72, 0.6, 0.35);
+const meshB = new THREE.Mesh(panelGeoB, matB);
+meshB.position.set(-5.5, -3.2, 0.5);
+meshB.rotation.y = 0.5;
+meshB.rotation.z = -0.12;
+scene.add(meshB);
+panels.push({ mesh: meshB, floatOffset: Math.PI * 0.9, floatSpeed: 0.55, rotSpeed: 0.0006 });
+
+// Thin vertical strip — right mid
+const panelGeoStrip = new THREE.PlaneGeometry(0.6, 7.5);
+const matStrip = new THREE.MeshStandardMaterial({
+  color: 0xC9A84C, transparent: true, opacity: 0.12,
+  roughness: 0.4, metalness: 0.8, side: THREE.DoubleSide
+});
+const meshStrip = new THREE.Mesh(panelGeoStrip, matStrip);
+meshStrip.position.set(6.5, 0, -3);
+meshStrip.rotation.y = -0.4;
+scene.add(meshStrip);
+panels.push({ mesh: meshStrip, floatOffset: Math.PI * 0.4, floatSpeed: 0.28, rotSpeed: 0.0002 });
+
+// Ghost translucent back panel
+const panelGeoGhost = new THREE.PlaneGeometry(10, 12);
+const matGhost = new THREE.MeshStandardMaterial({
+  color: 0x0D1B2A, transparent: true, opacity: 0.35,
+  roughness: 0.9, metalness: 0.1, side: THREE.DoubleSide
+});
+const meshGhost = new THREE.Mesh(panelGeoGhost, matGhost);
+meshGhost.position.set(0, 0, -5);
+meshGhost.rotation.y = 0.06;
+scene.add(meshGhost);
+
+// ─── FLOATING GEOMETRIC WIREFRAME RING ─────────────────
+const torusGeo = new THREE.TorusGeometry(2.2, 0.012, 16, 80);
+const torusMat = new THREE.MeshStandardMaterial({
+  color: 0xC9A84C, transparent: true, opacity: 0.22,
+  roughness: 0.3, metalness: 0.9
+});
+const torus = new THREE.Mesh(torusGeo, torusMat);
+torus.position.set(1.2, 0.2, -1);
+torus.rotation.x = 1.1;
+torus.rotation.z = 0.3;
+scene.add(torus);
+
+// Outer thin ring
+const torusGeo2 = new THREE.TorusGeometry(3.1, 0.006, 12, 80);
+const torusMat2 = new THREE.MeshStandardMaterial({
+  color: 0xF5E6B8, transparent: true, opacity: 0.1,
+  roughness: 0.4, metalness: 0.8
+});
+const torus2 = new THREE.Mesh(torusGeo2, torusMat2);
+torus2.position.set(1.2, 0.2, -1);
+torus2.rotation.x = 1.1;
+torus2.rotation.z = -0.2;
+scene.add(torus2);
+
+// ─── PARTICLE SYSTEM (floating dust/stars) ─────────────
+function makeParticles(count, range, color, size) {
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    positions[i * 3]     = (Math.random() - 0.5) * range;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * range;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * range * 0.4;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    color, size, transparent: true, opacity: 0.55, sizeAttenuation: true
+  });
+  return new THREE.Points(geo, mat);
+}
+
+const particles1 = makeParticles(320, 24, 0xC9A84C, 0.025);
+scene.add(particles1);
+const particles2 = makeParticles(180, 18, 0xF5E6B8, 0.015);
+scene.add(particles2);
+const particles3 = makeParticles(80, 20, 0xB85C38, 0.04);
+scene.add(particles3);
+
+// ─── MOUSE / PARALLAX ──────────────────────────────────
+let mouse = { x: 0, y: 0 };
+let targetMouse = { x: 0, y: 0 };
+
+document.addEventListener('mousemove', (e) => {
+  targetMouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+  targetMouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
+
+  // Custom cursor
+  document.getElementById('cursor').style.left = e.clientX + 'px';
+  document.getElementById('cursor').style.top  = e.clientY + 'px';
+  document.getElementById('cursor-ring').style.left = e.clientX + 'px';
+  document.getElementById('cursor-ring').style.top  = e.clientY + 'px';
+});
+
+// ─── ANIMATION LOOP ─────────────────────────────────────
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Smooth mouse follow
+  mouse.x += (targetMouse.x - mouse.x) * 0.04;
+  mouse.y += (targetMouse.y - mouse.y) * 0.04;
+
+  // Camera parallax
+  camera.position.x += (mouse.x * 0.7 - camera.position.x) * 0.03;
+  camera.position.y += (mouse.y * 0.5 - camera.position.y) * 0.03;
+  camera.lookAt(0, 0, 0);
+
+  // Float panels
+  panels.forEach((p) => {
+    const s = Math.sin(t * p.floatSpeed + p.floatOffset);
+    p.mesh.position.y += s * 0.0008;
+    p.mesh.rotation.z += p.rotSpeed * Math.sin(t * 0.3 + p.floatOffset);
+  });
+
+  // Rotate tori
+  torus.rotation.z  = 0.3 + t * 0.12;
+  torus2.rotation.z = -0.2 + t * 0.07;
+  torus.rotation.y  = mouse.x * 0.15;
+  torus2.rotation.y = mouse.x * -0.1;
+
+  // Drift particles
+  particles1.rotation.y = t * 0.018;
+  particles1.rotation.x = t * 0.009;
+  particles2.rotation.y = -t * 0.024;
+  particles3.rotation.z = t * 0.012;
+
+  // Rim light animation
+  rimLight.position.x = -4 + Math.sin(t * 0.4) * 1.5;
+  rimLight.position.y = 2 + Math.cos(t * 0.3) * 1.5;
+
+  renderer.render(scene, camera);
+}
+
+// ─── RESIZE HANDLER ─────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ─── INIT ───────────────────────────────────────────────
+animate();
+
+// Remove loading veil after short delay
+setTimeout(() => {
+  document.getElementById('veil').classList.add('hidden');
+  setTimeout(() => document.getElementById('veil').remove(), 1400);
+}, 900);
+
+</script>
+</body>
+</html>

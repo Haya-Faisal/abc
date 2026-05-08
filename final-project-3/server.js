@@ -16,17 +16,15 @@ let HTTPSserver = https.createServer(options, app);
 const { Server } = require("socket.io");
 const io = new Server(HTTPSserver);
 
-// Tiles
-// Each tile: { col, row, angleDeg, mainColor, ts }
-let tiles = [];
+// ── Tiles persistence ─────────────────────────────────────────────────────────
 const TILES_FILE = "tiles.json";
+let tiles = [];
 
 if (fs.existsSync(TILES_FILE)) {
   try {
     tiles = JSON.parse(fs.readFileSync(TILES_FILE, "utf8"));
   } catch (e) {
     console.warn("Could not parse tiles.json, starting fresh.", e.message);
-    tiles = [];
   }
 } else {
   fs.writeFileSync(TILES_FILE, "[]", "utf8");
@@ -36,26 +34,22 @@ function saveTiles() {
   fs.writeFileSync(TILES_FILE, JSON.stringify(tiles, null, 2), "utf8");
 }
 
-// Track active user sessions
-const activeUsers = new Map(); // { userId: { socketId, lastTouchX, lastTouchY, lastUpdate } }
+// ── Active users ──────────────────────────────────────────────────────────────
+const activeUsers = new Map();
 
-// Static files\
+// ── Static files ──────────────────────────────────────────────────────────────
 app.use(express.static("public"));
 
-//  Socket
+// ── Socket ────────────────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
-  // Send existing state to the new client
-  // socket.emit("historic-photos", photos);
+  // Send all saved tiles to new client
   socket.emit("historic-tiles", tiles);
 
-  // Client placed a new tile
+  // New tile placed — save and broadcast
   socket.on("new-tile", (tile) => {
-    // Validate with current schema: { col, row, theta, tiling, mainColor }
     if (
-      typeof tile.col !== "number" ||
-      typeof tile.row !== "number" ||
       typeof tile.theta !== "number" ||
       typeof tile.tiling !== "string" ||
       typeof tile.mainColor !== "string"
@@ -65,43 +59,33 @@ io.on("connection", (socket) => {
     }
 
     const record = {
+      id: tile.id || crypto.randomUUID(),
       col: tile.col,
       row: tile.row,
+      wx: tile.wx,
+      wy: tile.wy,
       theta: tile.theta,
       tiling: tile.tiling,
       mainColor: tile.mainColor,
       ts: Date.now(),
     };
 
-    // Upsert — replace if same cell already exists
-    const idx = tiles.findIndex(
-      (t) => t.col === tile.col && t.row === tile.row,
-    );
+    const idx = tiles.findIndex((t) => t.id === record.id);
     if (idx !== -1) tiles[idx] = record;
     else tiles.push(record);
 
     saveTiles();
-
-    // Broadcast to all OTHER clients
     socket.broadcast.emit("new-tile", record);
   });
 
-  // Handle user touch position sync
-  socket.on("user-touch-move", (data) => {
-    const { userId, x, y } = data;
-
-    // Validate touch data
-    if (!userId || typeof x !== "number" || typeof y !== "number") {
-      console.warn("Rejected malformed touch data:", data);
-      return;
-    }
-
-    // Track user's current touch position on server
+  // Touch position — broadcast so other clients show the ✦ indicator
+  socket.on("user-touch-move", ({ userId, x, y }) => {
+    if (!userId || typeof x !== "number" || typeof y !== "number") return;
     if (activeUsers.has(userId)) {
-      const user = activeUsers.get(userId);
-      user.lastTouchX = x;
-      user.lastTouchY = y;
-      user.lastUpdate = Date.now();
+      const u = activeUsers.get(userId);
+      u.lastTouchX = x;
+      u.lastTouchY = y;
+      u.lastUpdate = Date.now();
     } else {
       activeUsers.set(userId, {
         socketId: socket.id,
@@ -110,44 +94,27 @@ io.on("connection", (socket) => {
         lastUpdate: Date.now(),
       });
     }
-
-    // Broadcast to all OTHER clients (not the sender)
-    socket.broadcast.emit("user-touch-move", {
-      userId: userId,
-      x: x,
-      y: y,
-    });
+    socket.broadcast.emit("user-touch-move", { userId, x, y });
   });
 
-  //  Handle user stop touching
-  socket.on("user-touch-end", (data) => {
-    const { userId } = data;
+  socket.on("user-touch-end", ({ userId }) => {
+    if (!userId) return;
+    activeUsers.delete(userId);
+    socket.broadcast.emit("user-touch-end", { userId });
+  });
 
-    if (!userId) {
-      console.warn("Rejected malformed touch-end data:", data);
-      return;
-    }
-
-    // Remove user from active tracking
-    if (activeUsers.has(userId)) {
-      activeUsers.delete(userId);
-    }
-
-    // Broadcast to all OTHER clients
-    socket.broadcast.emit("user-touch-end", {
-      userId: userId,
-    });
+  // Ripple — broadcast origin so other clients spawn the ripple locally
+  socket.on("user-ripple", ({ userId, x, y }) => {
+    if (!userId || typeof x !== "number" || typeof y !== "number") return;
+    socket.broadcast.emit("user-ripple", { userId, x, y });
   });
 
   socket.on("disconnect", () => {
     console.log("someone disconnected", socket.id);
-
-    // Clean up: remove all users associated with this socket
-    for (const [userId, userData] of activeUsers.entries()) {
-      if (userData.socketId === socket.id) {
-        activeUsers.delete(userId);
-        // Notify all clients that this user stopped
-        io.emit("user-touch-end", { userId: userId });
+    for (const [uid, u] of activeUsers.entries()) {
+      if (u.socketId === socket.id) {
+        activeUsers.delete(uid);
+        io.emit("user-touch-end", { userId: uid });
       }
     }
   });

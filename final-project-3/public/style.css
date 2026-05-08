@@ -418,7 +418,7 @@ button{
   color: #003049;
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
-  font-size: 12px;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.03em;
@@ -438,7 +438,7 @@ button{
   transform: translateX(-50%);
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
-  font-size: 13px;
+  font-size: 15px;
   color: rgba(255,255,255);
   letter-spacing: 0.08em;
   pointer-events: none;
