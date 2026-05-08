@@ -592,7 +592,7 @@ function drawVectorTile(tile, progress) {
   // Draw in world space (no tile-level translate — each seg has own offset)
   translate(tile.wx, tile.wy);
   stroke(tile.color);
-  strokeWeight(1.2);
+  strokeWeight(1.7);
   noFill();
   const count = Math.floor(segs.length * progress);
   for (let i = 0; i < count; i++) {
