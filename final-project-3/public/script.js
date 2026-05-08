@@ -19,7 +19,7 @@ let pendingTiles = [];
 // ─── IGP settings ─────────────────────────────────────────────────────────────
 let igpTheta = Math.PI / 4;
 let igpTiling = "squareOctagon";
-let igpMainColor = "#1a4a8a";
+let igpMainColor = "#b1c6ef";
 
 // ─── Touch ────────────────────────────────────────────────────────────────────
 let touchX = -9999,
@@ -952,13 +952,17 @@ function openIGPModal() {
   document.getElementById("igp-modal").style.display = "flex";
   document.querySelector("canvas").style.pointerEvents = "none";
 
-  document.getElementById("igp-color-main").value = igpMainColor;
-  document.getElementById("swatch-main").style.background = igpMainColor;
-  document.getElementById("igp-color-main").oninput = (e) => {
-    igpMainColor = e.target.value;
-    document.getElementById("swatch-main").style.background = igpMainColor;
-    renderPreview();
-  };
+  document.querySelectorAll(".color-dot").forEach((dot) => {
+    dot.classList.toggle("selected", dot.dataset.color === igpMainColor);
+    dot.onclick = function () {
+      igpMainColor = this.dataset.color;
+      document
+        .querySelectorAll(".color-dot")
+        .forEach((d) => d.classList.remove("selected"));
+      this.classList.add("selected");
+      renderPreview();
+    };
+  });
 
   document.querySelectorAll(".tiling-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.tiling === igpTiling);

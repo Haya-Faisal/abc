@@ -458,3 +458,26 @@ button{
 #igp-modal {
   pointer-events: auto;
 }
+
+#color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.color-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  border: 2px solid rgba(255,255,255,0.3) !important;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  touch-action: manipulation;
+}
+
+.color-dot.selected {
+  border-color: #fff !important;
+  transform: scale(1.2);
+}
