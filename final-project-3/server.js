@@ -110,15 +110,14 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("user-touch-end", { userId });
   });
 
-  // Handle user ripples
   socket.on("user-ripple", (data) => {
     const { userId, x, y } = data;
     if (!userId || typeof x !== "number" || typeof y !== "number") {
       console.warn("Rejected malformed ripple data:", data);
       return;
     }
-    // Broadcast ripple to all other clients
-    socket.broadcast.emit("user-ripple", { userId, x, y });
+    // Broadcast ripple to all OTHER clients
+    socket.broadcast.emit("user-ripple", { x, y });
   });
 
   socket.on("disconnect", () => {

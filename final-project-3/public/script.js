@@ -334,13 +334,6 @@ function setup() {
     loop();
   });
 
-  // Listen for remote user ripples
-  socket.on("user-ripple", function (data) {
-    const { x, y } = data;
-    ripples.push({ x, y, startTime: millis() });
-    loop();
-  });
-
   // Remote ripple — spawn locally so all clients feel it
   socket.on("user-ripple", ({ x, y }) => {
     ripples.push({ x, y, startTime: millis() });
