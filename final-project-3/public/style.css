@@ -127,7 +127,7 @@ button{
   letter-spacing: 0.05em;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0,0,0,0.1);
-  padding-bottom: 3%;
+  padding-bottom: 13%;
 }
 
 #introButton:hover {
