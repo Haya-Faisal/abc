@@ -288,11 +288,14 @@ function buildTileSegs(theta, tilingType) {
 // p5 SETUP
 // ═══════════════════════════════════════════════════════════════════════════
 function setup() {
-  socket =
+  if (
     location.hostname.toLowerCase().startsWith("browsercircus") ||
     location.hostname.toLowerCase().startsWith("www")
-      ? io({ path: "/canvas-photo/socket.io" })
-      : io();
+  ) {
+    socket = io({ path: "/haya/port-4230/socket.io" });
+  } else {
+    socket = io();
+  }
 
   userId = "user_" + Math.random().toString(36).substr(2, 9);
 
