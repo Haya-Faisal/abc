@@ -782,6 +782,12 @@ function touchMoved() {
     loop();
     return false;
   }
+
+  if (Math.random() < 0.15) {
+    const ripple = { x: touchX, y: touchY };
+    ripples.push({ ...ripple, startTime: millis() });
+    socket.emit("user-ripple", { userId, ...ripple });
+  }
 }
 
 function touchEnded() {
@@ -853,6 +859,12 @@ function mouseDragged() {
     if (now - lastTouchSyncTime > TOUCH_SYNC_THROTTLE) {
       socket.emit("user-touch-move", { userId, x: touchX, y: touchY });
       lastTouchSyncTime = now;
+    }
+    // NEW: Emit ripples during drag
+    if (Math.random() < 0.15) {
+      const ripple = { x: touchX, y: touchY };
+      ripples.push({ ...ripple, startTime: millis() });
+      socket.emit("user-ripple", { userId, ...ripple });
     }
   }
 }
