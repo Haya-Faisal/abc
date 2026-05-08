@@ -428,7 +428,7 @@ function setup() {
 // p5 DRAW
 // ═══════════════════════════════════════════════════════════════════════════
 function draw() {
-  background("#74747d");
+  background("#cfcfd2");
 
   if (!isPanning && (Math.abs(panVX) > 0.1 || Math.abs(panVY) > 0.1)) {
     panX += panVX;
