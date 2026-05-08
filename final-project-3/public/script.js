@@ -742,6 +742,7 @@ function touchStarted() {
 
 function touchMoved() {
   if (igpModalOpen) return false;
+
   if (isPanning && touches.length >= 2) {
     const cx = (touches[0].x + touches[1].x) / 2,
       cy = (touches[0].y + touches[1].y) / 2;
@@ -755,31 +756,37 @@ function touchMoved() {
     loop();
     return false;
   }
+
   if (isTouching && touches.length === 1) {
     const w = screenToWorld(touches[0].x, touches[0].y);
     touchX = w.x;
     touchY = w.y;
+
     if (
       Math.sqrt(
         (touches[0].x - longPressX) ** 2 + (touches[0].y - longPressY) ** 2,
       ) > 10
     )
       cancelLongPress();
-    if (Math.random() < 0.15)
-      ripples.push({ x: touchX, y: touchY, startTime: millis() });
+
     const now = Date.now();
+
+    // Drag ripple — local + synced to other clients (throttled)
+    if (Math.random() < 0.15) {
+      ripples.push({ x: touchX, y: touchY, startTime: millis() });
+      if (now - lastTouchSyncTime > 100) {
+        socket.emit("user-ripple", { userId, x: touchX, y: touchY });
+      }
+    }
+
+    // Touch position sync
     if (now - lastTouchSyncTime > TOUCH_SYNC_THROTTLE) {
       socket.emit("user-touch-move", { userId, x: touchX, y: touchY });
       lastTouchSyncTime = now;
     }
+
     loop();
     return false;
-  }
-
-  if (Math.random() < 0.15) {
-    const ripple = { x: touchX, y: touchY };
-    ripples.push({ ...ripple, startTime: millis() });
-    socket.emit("user-ripple", { userId, ...ripple });
   }
 }
 
