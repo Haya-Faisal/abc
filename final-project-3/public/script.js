@@ -645,8 +645,8 @@ function placeTileAt(id, col, row, wx, wy, theta, tilingType, color, animate) {
 // WORLD / PAN
 // ═══════════════════════════════════════════════════════════════════════════
 function initWorld() {
-  worldW = width * 4;
-  worldH = height * 4;
+  worldW = 10000;
+  worldH = 10000;
   gridCols = Math.ceil(worldW / CELL_PX);
   gridRows = Math.ceil(worldH / CELL_PX);
   panX = -(worldW - width) / 2;
