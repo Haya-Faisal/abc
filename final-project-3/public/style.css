@@ -445,6 +445,7 @@ button{
   z-index: 10;
   white-space: nowrap;
   transition: opacity 2s ease;
+  max-width: 100%;
 }
 #pan-hint.hidden {
   opacity: 0;
