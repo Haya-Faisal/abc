@@ -44,10 +44,10 @@ app.use(express.static("public"));
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
-  // Send all saved tiles to new client
+  // Send all saved tiles to the new client
   socket.emit("historic-tiles", tiles);
 
-  // New tile placed — save and broadcast
+  // Client placed a new tile
   socket.on("new-tile", (tile) => {
     if (
       typeof tile.theta !== "number" ||
@@ -70,17 +70,23 @@ io.on("connection", (socket) => {
       ts: Date.now(),
     };
 
+    // Upsert by id
     const idx = tiles.findIndex((t) => t.id === record.id);
     if (idx !== -1) tiles[idx] = record;
     else tiles.push(record);
 
     saveTiles();
+
+    // Broadcast to all other clients
     socket.broadcast.emit("new-tile", record);
   });
 
-  // Touch position — broadcast so other clients show the ✦ indicator
+  // Touch position sync
   socket.on("user-touch-move", ({ userId, x, y }) => {
-    if (!userId || typeof x !== "number" || typeof y !== "number") return;
+    if (!userId || typeof x !== "number" || typeof y !== "number") {
+      console.warn("Rejected malformed touch data");
+      return;
+    }
     if (activeUsers.has(userId)) {
       const u = activeUsers.get(userId);
       u.lastTouchX = x;
@@ -101,12 +107,6 @@ io.on("connection", (socket) => {
     if (!userId) return;
     activeUsers.delete(userId);
     socket.broadcast.emit("user-touch-end", { userId });
-  });
-
-  // Ripple — broadcast origin so other clients spawn the ripple locally
-  socket.on("user-ripple", ({ userId, x, y }) => {
-    if (!userId || typeof x !== "number" || typeof y !== "number") return;
-    socket.broadcast.emit("user-ripple", { userId, x, y });
   });
 
   socket.on("disconnect", () => {

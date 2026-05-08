@@ -586,26 +586,30 @@ function addOneTile() {
 
 function restoreTile(t) {
   if (typeof t.theta !== "number" || !t.tiling || !t.mainColor) return;
-  // Derive col/row from saved data — support both old and new format
+
   let col, row, wx, wy;
+
   if (typeof t.col === "number" && typeof t.row === "number") {
+    // New format — col/row are authoritative
     col = t.col;
     row = t.row;
-    const c = cellCenter(col, row);
-    wx = t.wx !== undefined ? t.wx : c.x;
-    wy = t.wy !== undefined ? t.wy : c.y;
-  } else {
-    // Old format with just wx/wy — snap to nearest cell
+    wx = typeof t.wx === "number" ? t.wx : cellCenter(col, row).x;
+    wy = typeof t.wy === "number" ? t.wy : cellCenter(col, row).y;
+  } else if (typeof t.wx === "number" && typeof t.wy === "number") {
+    // Old format — derive col/row from world position
     wx = t.wx;
     wy = t.wy;
-    col = Math.round((wx - CELL_PX / 2) / CELL_PX);
-    row = Math.round((wy - CELL_PX / 2) / CELL_PX);
+    col = Math.floor(wx / CELL_PX);
+    row = Math.floor(wy / CELL_PX);
     col = Math.max(0, Math.min(gridCols - 1, col));
     row = Math.max(0, Math.min(gridRows - 1, row));
     const c = cellCenter(col, row);
     wx = c.x;
     wy = c.y;
+  } else {
+    return;
   }
+
   const id = t.id || cellKey(col, row);
   placeTileAt(id, col, row, wx, wy, t.theta, t.tiling, t.mainColor, false);
 }
