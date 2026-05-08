@@ -6,8 +6,8 @@ let socket;
 let canvas;
 
 // ─── Grid ─────────────────────────────────────────────────────────────────────
-const CELL_PX = 140; // size of each grid box in world pixels
-const TILE_SIZE = 132; // pattern fills the box tightly (CELL_PX - 2×4px border)
+const CELL_PX = 80; // size of each grid box in world pixels
+const TILE_SIZE = 72; // pattern fills the box tightly (CELL_PX - 2×4px border)
 const REVEAL_DUR = 700; // ms for draw-on animation
 
 let gridCols, gridRows; // number of cells in world

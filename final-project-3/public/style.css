@@ -434,7 +434,7 @@ button{
 #pan-hint {
   position: fixed;
   top: 16px;
-  left: 50%;
+  left: 22%;
   transform: translateX(-50%);
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
@@ -445,7 +445,7 @@ button{
   z-index: 10;
   white-space: nowrap;
   transition: opacity 2s ease;
-  max-width: 100%;
+  max-width: 40%;
 }
 #pan-hint.hidden {
   opacity: 0;
