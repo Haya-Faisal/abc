@@ -334,6 +334,13 @@ function setup() {
     loop();
   });
 
+  // Listen for remote user ripples
+  socket.on("user-ripple", function (data) {
+    const { x, y } = data;
+    ripples.push({ x, y, startTime: millis() });
+    loop();
+  });
+
   // Remote ripple — spawn locally so all clients feel it
   socket.on("user-ripple", ({ x, y }) => {
     ripples.push({ x, y, startTime: millis() });
@@ -790,6 +797,7 @@ function touchEnded() {
     Math.sqrt((touchX - touchStartX) ** 2 + (touchY - touchStartY) ** 2) < 14
   ) {
     ripples.push({ x: touchX, y: touchY, startTime: millis() });
+    // NEW: Broadcast ripple to other users
     socket.emit("user-ripple", { userId, x: touchX, y: touchY });
   }
   socket.emit("user-touch-end", { userId });
@@ -832,6 +840,7 @@ function mouseReleased() {
   const w = screenToWorld(mouseX, mouseY);
   if (Math.sqrt((w.x - touchStartX) ** 2 + (w.y - touchStartY) ** 2) < 14) {
     ripples.push({ x: w.x, y: w.y, startTime: millis() });
+    // NEW: Broadcast ripple to other users
     socket.emit("user-ripple", { userId, x: w.x, y: w.y });
   }
   socket.emit("user-touch-end", { userId });
