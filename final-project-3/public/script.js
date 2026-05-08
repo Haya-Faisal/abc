@@ -85,27 +85,99 @@ function initAudio() {
   if (audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   masterGain = audioContext.createGain();
-  masterGain.gain.value = 0.25;
+  masterGain.gain.value = 0.4;
   masterGain.connect(audioContext.destination);
 }
 
-function playPluck(x) {
+function playPluck(x, y) {
   if (!audioContext) return;
   const now = Date.now();
   if (now - lastPluckTime < PLUCK_COOLDOWN) return;
   lastPluckTime = now;
-  const osc = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  osc.type = "triangle";
-  osc.frequency.value = 300 + (x / worldW) * 500;
-  gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-  osc.connect(gain);
-  gain.connect(masterGain);
-  osc.start(audioContext.currentTime);
-  osc.stop(audioContext.currentTime + 0.15);
-}
 
+  const t = audioContext.currentTime;
+
+  // Map x position across world to a pentatonic scale
+  // These are frequencies of a minor pentatonic — sounds authentically Middle Eastern
+  const pentatonic = [220, 261.63, 311.13, 349.23, 392, 440, 523.25, 622.25];
+  const idx = Math.floor((x / worldW) * pentatonic.length) % pentatonic.length;
+  const freq = pentatonic[Math.max(0, idx)];
+
+  // ── 1. Noise burst (attack — the plectrum scrape) ──────────────────────
+  const bufferSize = audioContext.sampleRate * 0.04; // 40ms of noise
+  const noiseBuffer = audioContext.createBuffer(
+    1,
+    bufferSize,
+    audioContext.sampleRate,
+  );
+  const noiseData = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) noiseData[i] = Math.random() * 2 - 1;
+
+  const noise = audioContext.createBufferSource();
+  noise.buffer = noiseBuffer;
+
+  // Filter the noise to the string's frequency range
+  const noiseFilter = audioContext.createBiquadFilter();
+  noiseFilter.type = "bandpass";
+  noiseFilter.frequency.value = freq;
+  noiseFilter.Q.value = 8;
+
+  const noiseGain = audioContext.createGain();
+  noiseGain.gain.setValueAtTime(0.15, t);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+
+  noise.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(masterGain);
+  noise.start(t);
+  noise.stop(t + 0.04);
+
+  // ── 2. Fundamental sine (the string body resonating) ───────────────────
+  const fundamental = audioContext.createOscillator();
+  fundamental.type = "sine";
+  fundamental.frequency.value = freq;
+
+  const fundGain = audioContext.createGain();
+  fundGain.gain.setValueAtTime(0.0, t);
+  fundGain.gain.linearRampToValueAtTime(0.25, t + 0.008); // fast attack
+  fundGain.gain.exponentialRampToValueAtTime(0.001, t + 1.2); // slow decay
+
+  fundamental.connect(fundGain);
+  fundGain.connect(masterGain);
+  fundamental.start(t);
+  fundamental.stop(t + 1.2);
+
+  // ── 3. Second harmonic (gives it warmth, less electronic) ──────────────
+  const harmonic = audioContext.createOscillator();
+  harmonic.type = "sine";
+  harmonic.frequency.value = freq * 2;
+
+  const harmGain = audioContext.createGain();
+  harmGain.gain.setValueAtTime(0.0, t);
+  harmGain.gain.linearRampToValueAtTime(0.08, t + 0.008);
+  harmGain.gain.exponentialRampToValueAtTime(0.001, t + 0.6); // decays faster than fundamental
+
+  harmonic.connect(harmGain);
+  harmGain.connect(masterGain);
+  harmonic.start(t);
+  harmonic.stop(t + 0.6);
+
+  // ── 4. Subtle reverb tail using delay feedback ─────────────────────────
+  const delay = audioContext.createDelay(0.5);
+  delay.delayTime.value = 0.18; // ~180ms — feels like a small tiled room
+
+  const feedback = audioContext.createGain();
+  feedback.gain.value = 0.25;
+
+  const reverbGain = audioContext.createGain();
+  reverbGain.gain.value = 0.12;
+
+  fundGain.connect(reverbGain);
+  reverbGain.connect(delay);
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delay.connect(masterGain);
+}
 // ═══════════════════════════════════════════════════════════════════════════
 // HANKIN ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
