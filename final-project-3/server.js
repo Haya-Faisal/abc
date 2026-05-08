@@ -50,6 +50,8 @@ io.on("connection", (socket) => {
   // Client placed a new tile
   socket.on("new-tile", (tile) => {
     if (
+      typeof tile.col !== "number" ||
+      typeof tile.row !== "number" ||
       typeof tile.theta !== "number" ||
       typeof tile.tiling !== "string" ||
       typeof tile.mainColor !== "string"
@@ -59,11 +61,8 @@ io.on("connection", (socket) => {
     }
 
     const record = {
-      id: tile.id || crypto.randomUUID(),
       col: tile.col,
       row: tile.row,
-      wx: tile.wx,
-      wy: tile.wy,
       theta: tile.theta,
       tiling: tile.tiling,
       mainColor: tile.mainColor,
@@ -71,7 +70,9 @@ io.on("connection", (socket) => {
     };
 
     // Upsert by id
-    const idx = tiles.findIndex((t) => t.id === record.id);
+    const idx = tiles.findIndex(
+      (t) => t.col === tile.col && t.row === tile.row,
+    );
     if (idx !== -1) tiles[idx] = record;
     else tiles.push(record);
 
